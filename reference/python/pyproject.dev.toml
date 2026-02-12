@@ -50,6 +50,7 @@ dependencies = [
     "langchain-xai",
     "langchain-community",
     "langchain-mcp-adapters",
+    "langchain-amazon-nova",
     "langchain-astradb",
     #"langchain-ai21",
     "langchain-aws",
@@ -155,7 +156,6 @@ langchain-nomic = { path = "../../../langchain/libs/partners/nomic", editable = 
 langchain-ollama = { path = "../../../langchain/libs/partners/ollama", editable = true }
 langchain-openai = { path = "../../../langchain/libs/partners/openai", editable = true }
 langchain-perplexity = { path = "../../../langchain/libs/partners/perplexity", editable = true }
-langchain-prompty = { path = "../../../langchain/libs/partners/prompty", editable = true }
 langchain-qdrant = { path = "../../../langchain/libs/partners/qdrant", editable = true }
 langchain-xai = { path = "../../../langchain/libs/partners/xai", editable = true }
 
@@ -196,6 +196,7 @@ langchain-upstage = { path = "../../../langchain-upstage/libs/upstage", editable
 langchain-weaviate = { path = "../../../langchain-weaviate/libs/weaviate", editable = true }
 
 ## Non-langchain-ai org packages (alphabetical)
+langchain-amazon-nova = { path = "../../../langchain-amazon-nova/libs/amazon_nova", editable = true }
 langchain-parallel = { path = "../../../langchain-parallel", editable = true }
 langchain-tavily = { path = "../../../langchain-tavily", editable = true }
 
