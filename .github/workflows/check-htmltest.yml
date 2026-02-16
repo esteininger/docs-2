@@ -51,21 +51,39 @@ jobs:
         run: npm i -g mint@latest
 
       - name: "Build documentation"
-        run: make build
+        run: PYTHONPATH=${{ github.workspace }} uv run pipeline build
 
       - name: "Start Mint dev server and mirror"
+        env:
+          CI: "true"
+          BROWSER: "none"
+          # Ink (Mint's CLI) needs a TTY to output; script provides a PTY
+          TERM: "xterm-256color"
         run: |
-          cd build && nohup mint dev --port 3000 > /tmp/mint.log 2>&1 &
-          echo "Waiting for dev server..."
-          for i in {1..60}; do
+          echo "Build dir contents:"
+          ls -la build/ | head -20
+          echo ""
+          cd build && script -q -c "mint dev --port 3000 --disable-openapi" /tmp/mint.log &
+          MINT_PID=$!
+          echo "Started mint (PID $MINT_PID). Waiting for dev server..."
+          for i in $(seq 1 60); do
             if curl -sf http://localhost:3000/ > /dev/null 2>&1; then
               echo "Server ready"
               break
             fi
             if [ $i -eq 60 ]; then
-              echo "Server failed to start. Log:"
+              echo "Server failed to start after 2 minutes."
+              echo "Mint process running? $(kill -0 $MINT_PID 2>/dev/null && echo yes || echo no)"
+              echo "Processes listening on ports:"
+              ss -tlnp 2>/dev/null || netstat -tlnp 2>/dev/null || true
+              echo "--- /tmp/mint.log ---"
               cat /tmp/mint.log
+              echo "--- end log ---"
               exit 1
+            fi
+            if [ $((i % 5)) -eq 0 ] && [ -s /tmp/mint.log ]; then
+              echo "[$i] Mint output so far:"
+              tail -50 /tmp/mint.log
             fi
             sleep 2
           done
@@ -77,7 +95,6 @@ jobs:
             --no-parent \
             --no-host-directories \
             --convert-links \
-            --page-requisites \
             --adjust-extension \
             --domains=localhost \
             --wait=0 \
@@ -88,10 +105,6 @@ jobs:
             -P docs-mirror \
             http://localhost:3000/
 
-      - name: "📂 Locate mirrored HTML root"
-        id: locate
-        run: echo "root=docs-mirror" >> "$GITHUB_OUTPUT"
-
       - name: "Install htmltest"
         run: |
           curl -sSfL https://htmltest.wjdp.uk | bash -s -- -b ./bin
@@ -101,7 +114,12 @@ jobs:
         id: htmltest
         run: |
           set -o pipefail
-          ROOT="${{ steps.locate.outputs.root }}"
+          ROOT="${{ github.workspace }}/docs-mirror"
+          if [ ! -d "$ROOT" ]; then
+            echo "Error: mirrored docs dir missing: $ROOT"
+            ls -la "${{ github.workspace }}/" || true
+            exit 1
+          fi
           ./bin/htmltest -l 2 "$ROOT" 2>&1 | tee htmltest-output.txt
         continue-on-error: true
 
