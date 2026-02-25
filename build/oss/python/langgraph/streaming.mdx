@@ -12,7 +12,9 @@ What's possible with LangGraph streaming:
 * <Icon icon="chart-bar" size={16} /> [**Stream subgraph outputs**](#stream-subgraph-outputs) — include outputs from both the parent graph and any nested subgraphs.
 * <Icon icon="binary" size={16} /> [**Stream LLM tokens**](#messages) — capture token streams from anywhere: inside nodes, subgraphs, or tools.
 * <Icon icon="table" size={16} /> [**Stream custom data**](#stream-custom-data) — send custom updates or progress signals directly from tool functions.
+
 * <Icon icon="stack-push" size={16} /> [**Use multiple streaming modes**](#stream-multiple-modes) — choose from `values` (full state), `updates` (state deltas), `messages` (LLM tokens + metadata), `custom` (arbitrary user data), or `debug` (detailed traces).
+
 
 ## Supported stream modes
 
@@ -21,13 +23,16 @@ Pass one or more of the following stream modes as a list to the [`stream`](https
 
 
 
-| Mode       | Description                                                                                                                                                                         |
-| ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `values`   | Streams the full value of the state after each step of the graph.                                                                                                                   |
-| `updates`  | Streams the updates to the state after each step of the graph. If multiple updates are made in the same step (e.g., multiple nodes are run), those updates are streamed separately. |
-| `custom`   | Streams custom data from inside your graph nodes.                                                                                                                                   |
-| `messages` | Streams 2-tuples (LLM token, metadata) from any graph nodes where an LLM is invoked.                                                                                                |
-| `debug`    | Streams as much information as possible throughout the execution of the graph.                                                                                                      |
+
+
+| Mode | Description |
+| ---- | ----------- |
+| `values` | Streams the full value of the state after each step of the graph. |
+| `updates` | Streams the updates to the state after each step of the graph. If multiple updates are made in the same step (e.g., multiple nodes are run), those updates are streamed separately. |
+| `custom` | Streams custom data from inside your graph nodes. |
+| `messages` | Streams 2-tuples (LLM token, metadata) from any graph nodes where an LLM is invoked. |
+| `debug` | Streams as much information as possible throughout the execution of the graph. |
+
 
 ## Basic usage example
 
@@ -568,6 +573,8 @@ See [Async with Python < 3.11](#async) for usage examples.
 ```
     </Tab>
 </Tabs>
+
+
 
 
 
