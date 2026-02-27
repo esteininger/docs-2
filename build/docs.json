@@ -479,8 +479,7 @@
                       "group": "Improve evaluators",
                       "pages": [
                         "langsmith/improve-judge-evaluator-feedback",
-                        "langsmith/create-few-shot-evaluators",
-                        "langsmith/index-datasets-for-dynamic-few-shot-example-selection"
+                        "langsmith/create-few-shot-evaluators"
                       ]
                     },
                     {
@@ -2209,6 +2208,10 @@
     {
       "source": "/oss/javascript/integrations/chat/nvidia_ai_endpoints",
       "destination": "/oss/javascript/integrations/chat"
+    },
+    {
+      "source": "/langsmith/index-datasets-for-dynamic-few-shot-example-selection",
+      "destination": "/langsmith/manage-datasets"
     },
     {
       "source": "/langsmith/collector-proxy",
