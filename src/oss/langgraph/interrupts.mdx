@@ -237,7 +237,7 @@ graph = (
 
 config = {"configurable": {"thread_id": "1"}}
 
-# Step 1: invoke—both parallel nodes hit interrupt() and pause
+# Step 1: invoke - both parallel nodes hit interrupt() and pause
 interrupted_result = graph.invoke({"vals": []}, config)
 print(interrupted_result)
 """
@@ -307,7 +307,7 @@ const graph = new StateGraph(State)
 const config = { configurable: { thread_id: "1" } };
 
 async function main() {
-  // Step 1: invoke—both parallel nodes hit interrupt() and pause
+  // Step 1: invoke - both parallel nodes hit interrupt() and pause
   const interruptedResult = await graph.invoke({ vals: [] }, config);
   console.log(interruptedResult);
   /*
