@@ -51,15 +51,11 @@ lint_md_fix:
 
 lint_prose:
 	@echo "Linting prose with Vale..."
-	@if command -v vale >/dev/null 2>&1; then \
-		if [ -n "$(FILES)" ]; then \
-			vale --glob='!**/node_modules/**' $(FILES); \
-		else \
-			vale --glob='!**/node_modules/**' src/; \
-		fi; \
+	@command -v vale >/dev/null 2>&1 || { echo "Installing Vale for prose linting..."; brew install vale; }
+	@if [ -n "$(FILES)" ]; then \
+		vale --glob='!**/node_modules/**' $(FILES); \
 	else \
-		echo "vale not found. Install with: brew install vale or see https://vale.sh/docs/install"; \
-		exit 1; \
+		vale --glob='!**/node_modules/**' src/; \
 	fi
 
 test:
@@ -69,7 +65,6 @@ install:
 	@echo "Installing all dependencies"
 	uv sync --all-groups
 	npm install -g mint@latest
-	@command -v vale >/dev/null 2>&1 || { echo "Installing Vale for prose linting..."; brew install vale; }
 
 clean:
 	@echo "Cleaning build artifacts..."
