@@ -10,6 +10,131 @@ rss: true
 
 [Self-hosted LangSmith](/langsmith/self-hosted) is an add-on to the Enterprise plan designed for our largest, most security-conscious customers. For more details, refer to [Pricing](https://www.langchain.com/pricing). [Contact our sales team](https://www.langchain.com/contact-sales) if you want to get a license key to trial LangSmith in your environment.
 
+<Update label="2026-03-07" tags={["self-hosted"]}>
+## langsmith-observability-0.2.0
+
+- Implemented async sandbox creation UI with status polling to improve user workflow.
+- Enhanced experiment comparison with JSON/YAML syntax highlighting for better readability.
+- Improved thread trace open behavior by removing the expand button for a cleaner UI.
+- Introduced sandbox endpoint in smith-go to expand sandbox capabilities.
+- Updated backend to eliminate n+1 query in `list_personal_access_tokens_for_org` for better performance.
+- Supported OpenAI compatible endpoint in smith-polly for broader integration options.
+- Timeouts for bulk exports stuck in `CREATED` status to prevent process hanging.
+- Made gpt-5.4 the default OpenAI playground model to highlight the new version.
+- Added gpt-5.4 and gpt-5.4-pro model support in the playground for enhanced capabilities.
+- Enhanced the experiments table with models and prompts columns for better data organization.
+- Redesigned custom chart CRUD for an improved user experience.
+- Added filtering and grouping by prompt in the experiments table to streamline data handling.
+- Addressed agent builder runs rejection issue when limits change for better process control.
+- AWS IAM role support added for Agent Builder, Polly, and Insights to enhance security and integration.
+- Introduced ABAC-based UI project and run write permissions for refined access control.
+- Implemented sticky headers on new messages for better usability.
+- Updated Agent Builder with improved inbox counts and thread fetching logic for better message management.
+
+**Download the Helm chart:** [`langsmith-observability-0.2.0.tgz`](https://github.com/langchain-ai/helm/releases/download/langsmith-observability-0.2.0/langsmith-observability-0.2.0.tgz)
+</Update>
+
+<Update label="2026-03-07" tags={["self-hosted"]}>
+## langsmith-observability-0.2.0
+
+- Fixed an Insights agent bug that was not persisting categories.
+- Improved the UI for async sandbox creation with status polling.
+- Added JSON/YAML syntax highlighting to the experiment comparison feature.
+- Improved thread trace open behavior and removed the expand button in the frontend.
+- Added a new sandbox endpoint to smith-go.
+- Supported OpenAI-compatible endpoints for smith-polly.
+- Fixed the timeout issue with bulk exports stuck in `CREATED` status.
+- Allowed service identity access to create repo endpoint.
+- Recorded hub prompt commit in experiment session metadata in the playground.
+- Improved authorization for the `/sessions` shadow query.
+- Added new ABAC backend deployments (v2) for better security management.
+- Implemented projects and runs write permissions in the UI.
+- Added support for GPT-5.4 and GPT-5.4-pro models, including pricing and playground integration.
+- Made GPT-5.4 the default model for the OpenAI playground.
+- Increased the maximum number of tags displayed in the RunTags component.
+- Fixed an Agent Builder issue where runs were rejected when limits changed.
+- Resolved float errors in the `/sessions` go endpoint.
+- Ensured Redis cache returns fetched value when cache `SET` fails.
+- Supported AWS IAM roles for the Agent Builder, Polly, and Insights integration.
+- Improved the custom chart CRUD interface on the frontend.
+- Added the ability to filter and group experiments by prompt in the experiments table.
+- Updated inbox counts and thread fetching logic in Agent Builder.
+
+**Download the Helm chart:** [`langsmith-observability-0.2.0.tgz`](https://github.com/langchain-ai/helm/releases/download/langsmith-observability-0.2.0/langsmith-observability-0.2.0.tgz)
+</Update>
+
+<Update label="2026-03-07" tags={["self-hosted"]}>
+## langsmith-observability-0.2.0
+
+- Fixed an Insights agent bug that was not persisting categories.
+- Updated the UI for async sandbox creation with status polling.
+- Made the logo bigger in the sidebar.
+- Added JSON/YAML syntax highlighting to experiment comparisons.
+- Improved thread trace open behavior and removed the expand button.
+- Eliminated n+1 query in list personal access tokens for the organization.
+- Added a sandbox endpoint to smith-go.
+- Supported OpenAI compatible endpoint in smith-polly.
+- Timed out bulk exports stuck in `CREATED` status.
+- Allowed service identity access to create repo endpoint.
+- Recorded hub prompt commit in experiment session metadata in the playground.
+- Added models and prompts columns to the experiments table.
+- Increased maximum tags displayed in the RunTags component.
+- Added gpt-5.4 and gpt-5.4-pro model pricing and playground support.
+- Made gpt-5.4 the default OpenAI playground model.
+- Added support for AWS IAM role in Agent Builder, Polly, and Insights.
+- Redesigned custom chart CRUD UI.
+- Added functionality to filter and group by prompt in the experiments table.
+- Updated inbox counts and thread fetching logic in the Agent Builder.
+
+**Download the Helm chart:** [`langsmith-observability-0.2.0.tgz`](https://github.com/langchain-ai/helm/releases/download/langsmith-observability-0.2.0/langsmith-observability-0.2.0.tgz)
+</Update>
+
+<Update label="2026-03-07" tags={["self-hosted"]}>
+## langsmith-observability-0.2.0
+
+- Improved UI with async sandbox creation and status polling, enhancing user experience.
+- Enhanced experiment comparison with JSON/YAML syntax highlighting.
+- Improved thread trace open behavior by removing the expand button.
+- Resolved a bug in insights agent that was not persisting categories.
+- Fixed bulk exports stuck in CREATED status to improve reliability.
+- Increased max tags displayed in the RunTags component in the frontend.
+- Improved logo size in the sidebar for better visibility.
+- Resolved issues in the backend concerning personal access tokens to enhance performance.
+- Enhanced playground with support for GPT-5.4 and GPT-5.4-pro models.
+- Made GPT-5.4 the default model in the OpenAI playground.
+- Added models and prompts columns to the experiments table for better data visualization.
+- Fixed image preview issues with large attachments to improve user experience.
+- Introduced sticky headers for new messages to enhance readability.
+- Redesigned the custom chart CRUD UI for a more intuitive user interface.
+- Added filtering and grouping by prompts in the experiments table for improved data analysis.
+- Resolved AWS IAM role support issues for agent builder, Polly, and insights.
+- Fixed bugs in the Agent Builder to enhance its reliability and performance.
+
+**Download the Helm chart:** [`langsmith-observability-0.2.0.tgz`](https://github.com/langchain-ai/helm/releases/download/langsmith-observability-0.2.0/langsmith-observability-0.2.0.tgz)
+</Update>
+
+<Update label="2026-03-07" tags={["self-hosted"]}>
+## langsmith-auth-proxy-0.0.2
+
+- Fixed multiple security alerts in the frontend and backend, enhancing overall system security.
+- Fixed a security vulnerability preventing XSS attacks via unescaped URLs in the RichTextEditor.
+- Improved self-hosted playground functionality, ensuring better reliability.
+
+**Download the Helm chart:** [`langsmith-auth-proxy-0.0.2.tgz`](https://github.com/langchain-ai/helm/releases/download/langsmith-auth-proxy-0.0.2/langsmith-auth-proxy-0.0.2.tgz)
+</Update>
+
+<Update label="2026-03-07" tags={["self-hosted"]}>
+## langsmith-0.13.23
+
+- Fixed security vulnerabilities in the smith-frontend and smith-polly components.
+- Addressed a code injection vulnerability to enhance application security.
+- Restricted the `--allow-run` command to only the deno binary in smith-ace for improved security.
+- Prevented XSS in the frontend by ensuring URLs in the RichTextEditor are properly escaped.
+- Fixed Playground functionality issues in self-hosted environments.
+
+**Download the Helm chart:** [`langsmith-0.13.23.tgz`](https://github.com/langchain-ai/helm/releases/download/langsmith-0.13.23/langsmith-0.13.23.tgz)
+</Update>
+
 <Update label="2026-03-06" tags={["self-hosted"]} rss={{ title: "2026-03-06 - self-hosted" }}>
 ## langsmith-0.13.21
 
