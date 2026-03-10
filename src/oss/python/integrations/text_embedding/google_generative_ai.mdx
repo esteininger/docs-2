@@ -1,26 +1,28 @@
 ---
-title: "Google generative AI (AI studio & Gemini API) integration"
+title: "Google Generative AI (Gemini API) integration"
 sidebarTitle: GoogleGenerativeAIEmbeddings
-description: "Integrate with the Google generative AI (AI studio & Gemini API) embedding model using LangChain Python."
+description: "Integrate with Google Gemini API embedding models using LangChain Python."
 ---
 
-Connect to Google's generative AI embeddings service using the `GoogleGenerativeAIEmbeddings` class, found in the [langchain-google-genai](https://pypi.org/project/langchain-google-genai/) package.
+Connect to Google's Generative AI embeddings service using the `GoogleGenerativeAIEmbeddings` class, found in the [`langchain-google-genai`](https://pypi.org/project/langchain-google-genai/) package.
 
-This will help you get started with Google's Generative AI embedding models (like Gemini) using LangChain. For detailed documentation on `GoogleGenerativeAIEmbeddings` features and configuration options, please refer to the [API reference](https://python.langchain.com/v0.2/api_reference/google_genai/embeddings/langchain_google_genai.embeddings.GoogleGenerativeAIEmbeddings.html).
+This will help you get started with Google's Generative AI embedding models (like Gemini) using LangChain. For detailed documentation on `GoogleGenerativeAIEmbeddings` features and configuration options, please refer to the [API reference](https://reference.langchain.com/python/langchain-google-genai/embeddings/GoogleGenerativeAIEmbeddings).
 
 ## Overview
 
-### Integration details
+<Note>
+    `gemini-embedding-2-preview` natively supports text, image, video, audio, and PDF inputs via the Google GenAI SDK's `embed_content()` API. However, the LangChain `Embeddings` interface (`embed_query` / `embed_documents`) currently only accepts text inputs. Multimodal embedding support in LangChain is planned for a future release. For multimodal use cases today, use the [Google GenAI SDK](https://ai.google.dev/gemini-api/docs) directly.
+</Note>
 
-<ItemTable category="text_embedding" item="Google Gemini" />
+### Integration details
 
 ## Setup
 
-To access Google Generative AI embedding models you'll need to create a Google Cloud project, enable the Generative Language API, get an API key, and install the `langchain-google-genai` integration package.
+To access Google Gemini embedding models you'll need to create a Google Cloud project, enable the Generative Language API, get an API key, and install the `langchain-google-genai` integration package.
 
 ### Credentials
 
-To use Google Generative AI models, you must have an API key. You can create one in Google AI Studio. See the [Google documentation](https://ai.google.dev/gemini-api/docs/api-key) for instructions.
+To use Google Generative AI models, you must have an API key. You can create one in Google AI Studio. See the [Gemini API keys documentation](https://ai.google.dev/gemini-api/docs/api-key) for instructions.
 
 Once you have a key, set it as an environment variable `GOOGLE_API_KEY`:
 
@@ -50,7 +52,7 @@ pip install -qU  langchain-google-genai
 ```python
 from langchain_google_genai import GoogleGenerativeAIEmbeddings
 
-embeddings = GoogleGenerativeAIEmbeddings(model="models/gemini-embedding-001")
+embeddings = GoogleGenerativeAIEmbeddings(model="gemini-embedding-2-preview")
 vector = embeddings.embed_query("hello, world!")
 vector[:5]
 ```
@@ -61,6 +63,23 @@ vector[:5]
  -0.003886754624545574,
  -0.05774897709488869,
  0.0020742062479257584]
+```
+
+### Reduced dimensionality
+
+`gemini-embedding-2-preview` supports flexible output dimensions via Matryoshka Representation Learning (MRL). You can reduce dimensionality to optimize storage and latency:
+
+```python
+embeddings = GoogleGenerativeAIEmbeddings(
+    model="gemini-embedding-2-preview",
+    output_dimensionality=756,  # Suggested: 756, 1536, or 3072 (default)
+)
+vector = embeddings.embed_query("hello, world!")
+len(vector)
+```
+
+```text
+756
 ```
 
 ## Batch
@@ -134,15 +153,15 @@ from langchain_google_genai import GoogleGenerativeAIEmbeddings
 from sklearn.metrics.pairwise import cosine_similarity
 
 query_embeddings = GoogleGenerativeAIEmbeddings(
-    model="models/gemini-embedding-001", task_type="RETRIEVAL_QUERY"
+    model="gemini-embedding-2-preview", task_type="RETRIEVAL_QUERY"
 )
 doc_embeddings = GoogleGenerativeAIEmbeddings(
-    model="models/gemini-embedding-001", task_type="RETRIEVAL_DOCUMENT"
+    model="gemini-embedding-2-preview", task_type="RETRIEVAL_DOCUMENT"
 )
 
 q_embed = query_embeddings.embed_query("What is the capital of France?")
 d_embed = doc_embeddings.embed_documents(
-    ["The capital of France is Paris.", "Philipp is likes to eat pizza."]
+    ["The capital of France is Paris.", "Philipp likes to eat pizza."]
 )
 
 for i, d in enumerate(d_embed):
@@ -164,11 +183,14 @@ Cosine similarity with query: 0.5438283285204146
 
 ## API reference
 
-For detailed documentation on `GoogleGenerativeAIEmbeddings` features and configuration options, please refer to the [API reference](https://python.langchain.com/api_reference/google_genai/embeddings/langchain_google_genai.embeddings.GoogleGenerativeAIEmbeddings.html).
+For detailed documentation on `GoogleGenerativeAIEmbeddings` features and configuration options, please refer to the [API reference](https://reference.langchain.com/python/langchain-google-genai/embeddings/GoogleGenerativeAIEmbeddings).
 
 ## Additional configuration
 
-You can pass the following parameters to ChatGoogleGenerativeAI in order to customize the SDK's behavior:
+You can pass the following parameters to `GoogleGenerativeAIEmbeddings` to customize the SDK's behavior:
 
-- `client_options`: [Client Options](https://googleapis.dev/python/google-api-core/latest/client_options.html#module-google.api_core.client_options) to pass to the Google API Client, such as a custom `client_options["api_endpoint"]`
-- `transport`: The transport method to use, such as `rest`, `grpc`, or `grpc_asyncio`.
+- `base_url`: Custom base URL for the API client (e.g., a custom endpoint)
+- `output_dimensionality`: Reduce the dimensionality of returned embeddings (e.g., `output_dimensionality=256`)
+- `request_options`: Request options dict (e.g., `{"timeout": 10}`)
+- `additional_headers`: Additional HTTP headers to include in API requests
+- `client_args`: Additional arguments to pass to the underlying HTTP client
