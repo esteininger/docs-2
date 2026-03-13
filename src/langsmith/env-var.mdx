@@ -65,16 +65,13 @@ When [`BG_JOB_ISOLATED_LOOPS`](#bg-job-isolated-loops) is enabled, the pool is n
 
 Defaults to `150` connections.
 
-## `LANGGRAPH_CHECKPOINTER`
+## `LS_DEFAULT_CHECKPOINTER_BACKEND`
 
-JSON-encoded configuration for the checkpointer backend. Controls which storage system Agent Server uses for [checkpoint](/oss/langgraph/persistence) data.
+Sets the default [checkpointer backend](/langsmith/configure-checkpointer) for agent servers that don't specify one in `langgraph.json`. Accepted values: `"default"` (PostgreSQL), `"mongo"`, `"custom"`.
 
-```shell
-# Use MongoDB for checkpoints
-LANGGRAPH_CHECKPOINTER='{"backend": "mongo", "uri": "mongodb://user:password@host:27017/langgraph?replicaSet=rs0"}'
-```
+If the application's `langgraph.json` includes a `checkpointer.backend` value, it takes precedence over this variable.
 
-When set, takes precedence over the `checkpointer` key in `langgraph.json`. See [Configure checkpointer backend](/langsmith/configure-checkpointer) for available backends and options.
+When set to `"mongo"`, you must also provide the MongoDB connection URI via [`LS_MONGODB_URI`](#ls_mongodb_uri).
 
 ## `LANGSMITH_API_KEY`
 
@@ -110,11 +107,6 @@ Configure [log level](https://docs.python.org/3/library/logging.html#logging-lev
 
 Set `LOG_JSON` to `true` to render all log messages as JSON objects using the configured `JSONRenderer`. This produces structured logs that can be easily parsed or ingested by log management systems. Defaults to `false`.
 
-## `MONGODB_URI`
-
-Fallback MongoDB connection URI for the MongoDB checkpointer backend. Used only when neither the `uri` field in [`LANGGRAPH_CHECKPOINTER`](#langgraph_checkpointer) nor [`LS_MONGODB_URI`](#ls_mongodb_uri) is set.
-
-See [Configure checkpointer backend](/langsmith/configure-checkpointer) for details.
 
 ## `MOUNT_PREFIX`
 
@@ -170,9 +162,11 @@ OTel APM tracing was added in Agent Server version `0.5.32` and is currently in 
 
 ## `LS_MONGODB_URI`
 
-MongoDB connection URI for the MongoDB checkpointer backend. Used when the `uri` field is not set in [`LANGGRAPH_CHECKPOINTER`](#langgraph_checkpointer). Takes precedence over [`MONGODB_URI`](#mongodb_uri).
+MongoDB connection URI for the MongoDB checkpointer backend.
 
 The URI must point to a replica set member or `mongos` router and must include the database name in the path.
+
+See [Configure checkpointer backend](/langsmith/configure-checkpointer) for details.
 
 See [Configure checkpointer backend](/langsmith/configure-checkpointer) for details.
 

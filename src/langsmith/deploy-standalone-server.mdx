@@ -132,7 +132,7 @@ services:
 Run `docker compose up` with this file in the same folder.
 
 <Accordion title="With MongoDB checkpointing">
-To store checkpoints in MongoDB instead of Postgres, add a MongoDB service and configure the checkpointer environment variables. Postgres is still required for all other server data.
+To store checkpoints in MongoDB instead of Postgres, add a MongoDB service and configure the checkpointer backend. Set the backend to `"mongo"` in your `langgraph.json` or use the `LS_DEFAULT_CHECKPOINTER_BACKEND` environment variable. Postgres is still required for all other server data.
 
 ```yml
 volumes:
@@ -194,7 +194,7 @@ services:
             REDIS_URI: redis://langgraph-redis:6379
             LANGSMITH_API_KEY: ${LANGSMITH_API_KEY}
             DATABASE_URI: postgres://postgres:postgres@langgraph-postgres:5432/postgres?sslmode=disable
-            LANGGRAPH_CHECKPOINTER: '{"backend": "mongo"}'
+            LS_DEFAULT_CHECKPOINTER_BACKEND: mongo
             LS_MONGODB_URI: mongodb://langgraph-mongo:27017/langgraph?replicaSet=rs0
 ```
 
