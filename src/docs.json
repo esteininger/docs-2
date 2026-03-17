@@ -1591,7 +1591,8 @@
                             "oss/javascript/langgraph/use-functional-api"
                           ]
                         },
-                        "oss/javascript/langgraph/pregel"
+                        "oss/javascript/langgraph/pregel",
+                        "oss/javascript/langgraph/streaming-protocol"
                       ]
                     }
                   ]
