@@ -1,4 +1,4 @@
-```python
+# :snippet-start: long-term-memory-read-tool-postgres-py
 from dataclasses import dataclass
 
 from langchain.agents import create_agent
@@ -13,6 +13,18 @@ class Context:
 
 
 DB_URI = "postgresql://postgres:postgres@localhost:5442/postgres?sslmode=disable"
+# :remove-start:
+import os
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+from conftest import get_postgres_uri, prepare_postgres_store
+
+DB_URI = get_postgres_uri()
+prepare_postgres_store(DB_URI)
+os.environ.setdefault("ANTHROPIC_API_KEY", "sk-ant-test-key")
+# :remove-end:
 
 with PostgresStore.from_conn_string(DB_URI) as store:
     store.setup()
@@ -36,4 +48,10 @@ with PostgresStore.from_conn_string(DB_URI) as store:
         {"messages": [{"role": "user", "content": "look up user information"}]},
         context=Context(user_id="user_123"),
     )
-```
+# :snippet-end:
+
+# :remove-start:
+assert result is not None
+assert "messages" in result
+print("✓ Read tool with PostgresStore works correctly")
+# :remove-end:

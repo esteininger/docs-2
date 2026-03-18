@@ -1,4 +1,4 @@
-```python
+# :snippet-start: long-term-memory-write-tool-postgres-py
 from dataclasses import dataclass
 from typing import Any, cast
 
@@ -29,6 +29,18 @@ def save_user_info(user_info: UserInfo, runtime: ToolRuntime[Context]) -> str:
 
 
 DB_URI = "postgresql://postgres:postgres@localhost:5442/postgres?sslmode=disable"
+# :remove-start:
+import os
+import sys
+from pathlib import Path
+
+os.environ.setdefault("ANTHROPIC_API_KEY", "sk-ant-test-key")
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+from conftest import get_postgres_uri, prepare_postgres_store
+
+DB_URI = get_postgres_uri()
+prepare_postgres_store(DB_URI)
+# :remove-end:
 
 with PostgresStore.from_conn_string(DB_URI) as store:
     store.setup()
@@ -43,4 +55,15 @@ with PostgresStore.from_conn_string(DB_URI) as store:
         {"messages": [{"role": "user", "content": "My name is John Smith"}]},
         context=Context(user_id="user_123"),
     )
-```
+# :snippet-end:
+
+# :remove-start:
+if __name__ == "__main__":
+    with PostgresStore.from_conn_string(DB_URI) as store:
+        store.setup()
+        store.put(("users",), "user_123", {"name": "John Smith"})
+        saved_data = store.get(("users",), "user_123")
+        assert saved_data is not None
+        assert saved_data.value["name"] == "John Smith"
+    print("✓ Write tool with PostgresStore works correctly")
+# :remove-end:

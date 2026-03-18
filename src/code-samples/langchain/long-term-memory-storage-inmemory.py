@@ -1,4 +1,4 @@
-```python
+# :snippet-start: long-term-memory-storage-inmemory-py
 from collections.abc import Sequence
 
 from langgraph.store.base import IndexConfig
@@ -32,4 +32,19 @@ item = store.get(namespace, "a-memory")
 items = store.search(
     namespace, filter={"my-key": "my-value"}, query="language preferences"
 )
-```
+# :snippet-end:
+
+# :remove-start:
+if __name__ == "__main__":
+    # Verify the operations work
+    assert item is not None
+    assert item.value["my-key"] == "my-value"
+    assert "rules" in item.value
+    assert len(item.value["rules"]) == 2
+
+    # Verify search returns results
+    assert len(items) > 0
+    assert items[0].value["my-key"] == "my-value"
+
+    print("✓ InMemoryStore operations work correctly")
+# :remove-end:

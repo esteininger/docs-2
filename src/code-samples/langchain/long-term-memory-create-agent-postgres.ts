@@ -1,4 +1,4 @@
-```ts
+// :snippet-start: long-term-memory-create-agent-postgres-js
 import { createAgent } from "langchain";
 import { PostgresStore } from "@langchain/langgraph-checkpoint-postgres/store";
 
@@ -13,4 +13,12 @@ const agent = createAgent({
   tools: [],
   store,
 });
-```
+// :snippet-end:
+
+// :remove-start:
+if (!agent) {
+  throw new Error("Agent creation failed");
+}
+console.log("✓ Agent with PostgresStore created successfully");
+await store.stop();
+// :remove-end:

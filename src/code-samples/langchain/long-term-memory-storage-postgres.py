@@ -1,4 +1,4 @@
-```python
+# :snippet-start: long-term-memory-storage-postgres-py
 from collections.abc import Sequence
 
 from langgraph.store.base import IndexConfig
@@ -11,6 +11,16 @@ def embed(texts: Sequence[str]) -> list[list[float]]:
 
 
 DB_URI = "postgresql://postgres:postgres@localhost:5442/postgres?sslmode=disable"
+# :remove-start:
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+from conftest import get_postgres_uri, prepare_postgres_store
+
+DB_URI = get_postgres_uri()
+prepare_postgres_store(DB_URI)
+# :remove-end:
 
 with PostgresStore.from_conn_string(
     DB_URI,
@@ -35,4 +45,14 @@ with PostgresStore.from_conn_string(
     items = store.search(
         namespace, filter={"my-key": "my-value"}, query="language preferences"
     )
-```
+# :snippet-end:
+
+# :remove-start:
+if __name__ == "__main__":
+    assert item is not None
+    assert item.value["my-key"] == "my-value"
+    assert "rules" in item.value
+    assert len(item.value["rules"]) == 2
+    assert len(items) > 0
+    print("✓ PostgresStore operations work correctly")
+# :remove-end:
