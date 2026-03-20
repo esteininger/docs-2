@@ -44,8 +44,8 @@ result = await swr(
 
 | Parameter | Default | Description |
 |---|---|---|
-| `fresh_for` | `timedelta(0)` | Duration to treat a cached value as fresh. During this window, `swr` returns the cached value with no revalidation |
-| `max_age` | `timedelta(days=1)` | Maximum lifetime of a cached entry. After this, `swr` blocks on the loader before returning. Capped at 1 day |
+| `fresh_for` | `timedelta(0)` | Duration to treat a cached value as fresh. During this window, `swr` returns the cached value with no revalidation. |
+| `max_age` | `timedelta(days=1)` | Maximum lifetime of a cached entry. After this, `swr` blocks on the loader before returning. Capped at 1 day. |
 
 ### How revalidation works
 
