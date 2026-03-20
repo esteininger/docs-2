@@ -244,7 +244,7 @@ Design guidelines:
 
 - Paths are absolute (`/x/y.txt`). Decide how to map them to your storage keys/rows.
 - Implement `ls` and `glob` efficiently (server-side listing where available, otherwise local filter).
-- Return structured result types with `error` field for missing files or invalid patterns (do not raise).
+- Return structured result types with `error` field for missing files or invalid patterns.
 - For external persistence, set `files_update=None` in results; only in-state backends should return a `files_update` dict.
 
 S3-style outline:
