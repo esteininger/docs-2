@@ -8,6 +8,11 @@ export const ExampleEmbed = ({
   maxHeight = 700
 }) => {
 // src/ExampleEmbed.tsx
+
+// src/constants.ts
+var PROD_BASE = "https://ui-patterns.langchain.com";
+
+// src/ExampleEmbed.tsx
 var iframeCache = (() => {
   const g = globalThis;
   if (!g.__lcExampleIframeCache) {
@@ -23,7 +28,6 @@ function detectPageTheme() {
   }
   return "light";
 }
-var PROD_BASE = "https://playground-git-main-langchain.vercel.app";
 var LOCAL_BASE = "http://localhost";
 var LOCAL_PORTS = {
   "ai-elements": 4600,
