@@ -8,7 +8,7 @@ Deep Agents work with any [LangChain chat model](/oss/javascript/langchain/model
 
 
 
-The simplest way to specify a model is to pass a string to [createDeepAgent](https://reference.langchain.com/javascript/deepagents/agent/createDeepAgent). Use the `provider:model` format to select a specific provider:
+The simplest way to specify a model is to pass a string to [`createDeepAgent`](https://reference.langchain.com/javascript/deepagents/agent/createDeepAgent). Use the `provider:model` format to select a specific provider:
 
 
 
@@ -18,11 +18,11 @@ const agent = createDeepAgent({ model: "openai:gpt-5.3-codex" });
 ```
 
 
-Under the hood, this calls [init_chat_model](https://reference.langchain.com/javascript/langchain/chat_models/universal/initChatModel) with default parameters.
+Under the hood, this calls [`init_chat_model`](https://reference.langchain.com/javascript/langchain/chat_models/universal/initChatModel) with default parameters.
 
 ## Configure model parameters
 
-To configure model-specific parameters, use [init_chat_model](https://reference.langchain.com/javascript/langchain/chat_models/universal/initChatModel) or instantiate a provider model class directly:
+To configure model-specific parameters, use [`init_chat_model`](https://reference.langchain.com/javascript/langchain/chat_models/universal/initChatModel) or instantiate a provider model class directly:
 
 
 
