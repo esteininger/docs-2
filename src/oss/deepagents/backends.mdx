@@ -254,52 +254,6 @@ Design guidelines:
 
 S3-style outline:
 
-:::python
-```python
-from deepagents.backends.protocol import (
-    BackendProtocolV2, WriteResult, EditResult,
-    LsResult, ReadResult, ReadRawResult, GrepResult, GlobResult,
-)
-
-class S3Backend(BackendProtocolV2):
-    def __init__(self, bucket: str, prefix: str = ""):
-        self.bucket = bucket
-        self.prefix = prefix.rstrip("/")
-
-    def _key(self, path: str) -> str:
-        return f"{self.prefix}{path}"
-
-    def ls(self, path: str) -> LsResult:
-        # List objects under _key(path); return LsResult(files=[...])
-        ...
-
-    def read(self, file_path: str, offset: int = 0, limit: int = 500) -> ReadResult:
-        # Fetch object; return ReadResult(content=..., mimeType=...)
-        # For binary files, return Uint8Array content
-        ...
-
-    def read_raw(self, file_path: str) -> ReadRawResult:
-        # Return ReadRawResult(data=FileData)
-        ...
-
-    def grep(self, pattern: str, path: str | None = None, glob: str | None = None) -> GrepResult:
-        # Search text files; skip binary; return GrepResult(matches=[...])
-        ...
-
-    def glob(self, pattern: str, path: str = "/") -> GlobResult:
-        # Apply glob relative to path across keys; return GlobResult(files=[...])
-        ...
-
-    def write(self, file_path: str, content: str) -> WriteResult:
-        # Enforce create‑only semantics; return WriteResult(path=file_path, files_update=None)
-        ...
-
-    def edit(self, file_path: str, old_string: str, new_string: str, replace_all: bool = False) -> EditResult:
-        # Read → replace (respect uniqueness vs replace_all) → write → return occurrences
-        ...
-```
-:::
-
 :::js
 ```typescript
 import type {
@@ -360,7 +314,7 @@ Postgres-style outline:
 - Table `files(path text primary key, content text, mime_type text, created_at timestamptz, modified_at timestamptz)`
 - Map tool operations onto SQL:
   - `ls` uses `WHERE path LIKE $1 || '%'` → return `LsResult`
-  - `glob` filter in SQL or fetch then apply glob in Python → return `GlobResult`
+  - `glob` filter in SQL or fetch then apply glob locally → return `GlobResult`
   - `grep` can fetch candidate rows by extension or last modified time, then scan lines → return `GrepResult`
 
 ## Add policy hooks
@@ -392,42 +346,6 @@ class GuardedBackend(FilesystemBackend):
 :::
 
 Generic wrapper (works with any backend):
-
-:::python
-```python
-from deepagents.backends.protocol import (
-    BackendProtocolV2, WriteResult, EditResult,
-    LsResult, ReadResult, ReadRawResult, GrepResult, GlobResult,
-)
-
-class PolicyWrapper(BackendProtocolV2):
-    def __init__(self, inner: BackendProtocolV2, deny_prefixes: list[str] | None = None):
-        self.inner = inner
-        self.deny_prefixes = [p if p.endswith("/") else p + "/" for p in (deny_prefixes or [])]
-
-    def _deny(self, path: str) -> bool:
-        return any(path.startswith(p) for p in self.deny_prefixes)
-
-    def ls(self, path: str) -> LsResult:
-        return self.inner.ls(path)
-    def read(self, file_path: str, offset: int = 0, limit: int = 500) -> ReadResult:
-        return self.inner.read(file_path, offset=offset, limit=limit)
-    def read_raw(self, file_path: str) -> ReadRawResult:
-        return self.inner.read_raw(file_path)
-    def grep(self, pattern: str, path: str | None = None, glob: str | None = None) -> GrepResult:
-        return self.inner.grep(pattern, path, glob)
-    def glob(self, pattern: str, path: str = "/") -> GlobResult:
-        return self.inner.glob(pattern, path)
-    def write(self, file_path: str, content: str) -> WriteResult:
-        if self._deny(file_path):
-            return WriteResult(error=f"Writes are not allowed under {file_path}")
-        return self.inner.write(file_path, content)
-    def edit(self, file_path: str, old_string: str, new_string: str, replace_all: bool = False) -> EditResult:
-        if self._deny(file_path):
-            return EditResult(error=f"Edits are not allowed under {file_path}")
-        return self.inner.edit(file_path, old_string, new_string, replace_all)
-```
-:::
 
 :::js
 ```typescript
@@ -495,21 +413,6 @@ if (result.error) {
   // Text file — content is string
   console.log(`Text file: ${result.mimeType}`); // "text/plain"
 }
-```
-:::
-
-:::python
-```python
-result = backend.read("/workspace/screenshot.png")
-
-if result.error:
-    print(result.error)
-elif isinstance(result.content, bytes):
-    # Binary file — content is bytes, mime_type is set
-    print(f"Binary file: {result.mime_type}")  # "image/png"
-else:
-    # Text file — content is str
-    print(f"Text file: {result.mime_type}")  # "text/plain"
 ```
 :::
 
@@ -647,20 +550,8 @@ const v2Sandbox = adaptSandboxProtocol(v1Sandbox);
 ```
 :::
 
-:::python
-```python
-from deepagents.backends.utils import adapt_backend_protocol, adapt_sandbox_protocol
-
-# Adapt a V1 backend to V2
-v2_backend = adapt_backend_protocol(v1_backend)
-
-# Adapt a V1 sandbox to V2
-v2_sandbox = adapt_sandbox_protocol(v1_sandbox)
-```
-:::
-
 <Note>
-The framework auto-adapts V1 backends passed to `create_deep_agent()`. Manual adaptation is only needed when calling protocol methods directly.
+The framework auto-adapts V1 backends passed to `createDeepAgent()`. Manual adaptation is only needed when calling protocol methods directly.
 </Note>
 
 ### FileData migration
@@ -675,16 +566,6 @@ if (isFileDataV1(data)) {
   const v2Data = migrateToFileDataV2(data, "/path/to/file.txt");
   // { content: "line1\nline2", mimeType: "text/plain", created_at: ..., modified_at: ... }
 }
-```
-:::
-
-:::python
-```python
-from deepagents.backends.utils import migrate_to_file_data_v2, is_file_data_v1
-
-if is_file_data_v1(data):
-    v2_data = migrate_to_file_data_v2(data, "/path/to/file.txt")
-    # {"content": "line1\nline2", "mimeType": "text/plain", ...}
 ```
 :::
 
