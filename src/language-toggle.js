@@ -7,53 +7,30 @@
  * overview page.
  *
  * How it works:
- * 1. Click listener detects language toggle clicks and stores current URL+hash
- * 2. History API interception (pushState/replaceState) and popstate/hashchange
- *    listeners detect when Mintlify's client-side routing changes the path
- * 3. On path change, check if we're switching languages and redirect to equivalent page
- *
- * Note: Mintlify re-executes custom JS on each client-side navigation, so we
- * persist state in sessionStorage and guard against duplicate event listeners.
+ * 1. Tracks the current OSS page URL in sessionStorage (survives script re-execution)
+ * 2. Intercepts pushState/replaceState to detect language switches before they render
+ * 3. On language switch, hides the page and immediately redirects so the wrong page
+ *    never visibly appears
  */
 
 (function () {
   "use strict";
 
-  const PYTHON_PREFIX = "/oss/python/";
-  const JS_PREFIX = "/oss/javascript/";
-  const STORAGE_KEY = "__lang_toggle_prev";
-
-  // Mintlify CSS class selector for language dropdown items
-  const LANGUAGE_TOGGLE_SELECTOR = ".nav-dropdown-item";
+  var PYTHON_PREFIX = "/oss/python/";
+  var JS_PREFIX = "/oss/javascript/";
+  var STORAGE_KEY = "__lang_toggle_prev";
+  var LANGUAGE_TOGGLE_SELECTOR = ".nav-dropdown-item";
 
   function getPreviousUrl() {
-    try {
-      return sessionStorage.getItem(STORAGE_KEY);
-    } catch (e) {
-      return null;
-    }
+    try { return sessionStorage.getItem(STORAGE_KEY); } catch (e) { return null; }
   }
 
   function setPreviousUrl(url) {
-    try {
-      sessionStorage.setItem(STORAGE_KEY, url);
-    } catch (e) {}
+    try { sessionStorage.setItem(STORAGE_KEY, url); } catch (e) {}
   }
 
   function clearPreviousUrl() {
-    try {
-      sessionStorage.removeItem(STORAGE_KEY);
-    } catch (e) {}
-  }
-
-  function getEquivalentPath(sourcePath, targetLang) {
-    const sourcePrefix = targetLang === "python" ? JS_PREFIX : PYTHON_PREFIX;
-    const targetPrefix = targetLang === "python" ? PYTHON_PREFIX : JS_PREFIX;
-
-    if (sourcePath.startsWith(sourcePrefix)) {
-      return targetPrefix + sourcePath.substring(sourcePrefix.length);
-    }
-    return null;
+    try { sessionStorage.removeItem(STORAGE_KEY); } catch (e) {}
   }
 
   function getPathLanguage(path) {
@@ -62,39 +39,55 @@
     return null;
   }
 
+  function getEquivalentPath(sourcePath, targetLang) {
+    var sourcePrefix = targetLang === "python" ? JS_PREFIX : PYTHON_PREFIX;
+    var targetPrefix = targetLang === "python" ? PYTHON_PREFIX : JS_PREFIX;
+    if (sourcePath.startsWith(sourcePrefix)) {
+      return targetPrefix + sourcePath.substring(sourcePrefix.length);
+    }
+    return null;
+  }
+
   function updateCurrent() {
-    const lang = getPathLanguage(location.pathname);
-    if (lang) {
+    if (getPathLanguage(location.pathname)) {
       setPreviousUrl(location.pathname + location.hash);
     }
   }
 
-  function checkRedirect() {
-    const currentLang = getPathLanguage(location.pathname);
-    if (!currentLang) return;
-
+  function computeRedirect(newPath) {
     var previousUrl = getPreviousUrl();
-    if (!previousUrl) {
-      updateCurrent();
-      return;
-    }
+    if (!previousUrl) return null;
 
     var parts = previousUrl.split("#");
     var prevPath = parts[0];
     var prevHash = parts[1] || "";
     var prevLang = getPathLanguage(prevPath);
+    var newLang = getPathLanguage(newPath);
 
-    if (prevLang && prevLang !== currentLang) {
-      var equivalentPath = getEquivalentPath(prevPath, currentLang);
-
-      if (equivalentPath && equivalentPath !== location.pathname) {
-        clearPreviousUrl();
-        location.replace(equivalentPath + (prevHash ? "#" + prevHash : ""));
-        return;
+    if (prevLang && newLang && prevLang !== newLang) {
+      var equiv = getEquivalentPath(prevPath, newLang);
+      if (equiv && equiv !== newPath) {
+        return equiv + (prevHash ? "#" + prevHash : "");
       }
     }
+    return null;
+  }
 
-    updateCurrent();
+  function extractPath(args) {
+    var url = args[2];
+    if (!url) return null;
+    try {
+      if (typeof url === "string" && url.startsWith("/")) return url.split("?")[0].split("#")[0];
+      var parsed = new URL(url, location.origin);
+      if (parsed.origin === location.origin) return parsed.pathname;
+    } catch (e) {}
+    return null;
+  }
+
+  function hidePageAndRedirect(redirect) {
+    clearPreviousUrl();
+    document.documentElement.style.visibility = "hidden";
+    location.replace(redirect);
   }
 
   document.addEventListener(
@@ -107,35 +100,55 @@
     true,
   );
 
-  // Only patch History API once to avoid stacking interceptors
   if (!window.__langTogglePatched) {
     window.__langTogglePatched = true;
-
-    var lastPath = location.pathname;
-
-    function onPathChange() {
-      if (location.pathname !== lastPath) {
-        lastPath = location.pathname;
-        checkRedirect();
-      }
-    }
-
-    window.addEventListener("popstate", onPathChange);
-    window.addEventListener("hashchange", onPathChange);
 
     var originalPushState = history.pushState;
     var originalReplaceState = history.replaceState;
 
     history.pushState = function () {
+      var targetPath = extractPath(arguments);
+      if (targetPath) {
+        var redirect = computeRedirect(targetPath);
+        if (redirect) {
+          hidePageAndRedirect(redirect);
+          return;
+        }
+      }
       originalPushState.apply(this, arguments);
-      onPathChange();
+      updateCurrent();
     };
 
     history.replaceState = function () {
+      var targetPath = extractPath(arguments);
+      if (targetPath) {
+        var redirect = computeRedirect(targetPath);
+        if (redirect) {
+          hidePageAndRedirect(redirect);
+          return;
+        }
+      }
       originalReplaceState.apply(this, arguments);
-      onPathChange();
+      updateCurrent();
     };
+
+    window.addEventListener("popstate", function () { updateCurrent(); });
   }
 
-  checkRedirect();
+  var pendingRedirect = (function () {
+    var previousUrl = getPreviousUrl();
+    if (!previousUrl) return null;
+    var prevLang = getPathLanguage(previousUrl.split("#")[0]);
+    var currentLang = getPathLanguage(location.pathname);
+    if (prevLang && currentLang && prevLang !== currentLang) {
+      return computeRedirect(location.pathname);
+    }
+    return null;
+  })();
+
+  if (pendingRedirect) {
+    hidePageAndRedirect(pendingRedirect);
+  } else {
+    updateCurrent();
+  }
 })();
