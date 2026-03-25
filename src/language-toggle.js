@@ -7,31 +7,21 @@
  * overview page.
  *
  * How it works:
- * 1. Tracks the current OSS page URL in sessionStorage (survives script re-execution)
- * 2. Intercepts pushState/replaceState to detect language switches before they render
- * 3. On language switch, hides the page and immediately redirects so the wrong page
- *    never visibly appears
+ * Mintlify's language dropdown renders <a> tags inside a Radix UI portal. Next.js
+ * intercepts clicks on these <a> tags for client-side SPA navigation. We use a
+ * MutationObserver to detect when the dropdown portal appears, then rewrite the
+ * href on each dropdown link to point to the equivalent page in the other language.
+ * Next.js then navigates directly to the correct page — no redirect or page refresh.
  */
 
 (function () {
   "use strict";
 
+  if (window.__langToggleInit) return;
+  window.__langToggleInit = true;
+
   var PYTHON_PREFIX = "/oss/python/";
   var JS_PREFIX = "/oss/javascript/";
-  var STORAGE_KEY = "__lang_toggle_prev";
-  var LANGUAGE_TOGGLE_SELECTOR = ".nav-dropdown-item";
-
-  function getPreviousUrl() {
-    try { return sessionStorage.getItem(STORAGE_KEY); } catch (e) { return null; }
-  }
-
-  function setPreviousUrl(url) {
-    try { sessionStorage.setItem(STORAGE_KEY, url); } catch (e) {}
-  }
-
-  function clearPreviousUrl() {
-    try { sessionStorage.removeItem(STORAGE_KEY); } catch (e) {}
-  }
 
   function getPathLanguage(path) {
     if (path.startsWith(PYTHON_PREFIX)) return "python";
@@ -48,107 +38,44 @@
     return null;
   }
 
-  function updateCurrent() {
-    if (getPathLanguage(location.pathname)) {
-      setPreviousUrl(location.pathname + location.hash);
-    }
-  }
-
-  function computeRedirect(newPath) {
-    var previousUrl = getPreviousUrl();
-    if (!previousUrl) return null;
-
-    var parts = previousUrl.split("#");
-    var prevPath = parts[0];
-    var prevHash = parts[1] || "";
-    var prevLang = getPathLanguage(prevPath);
-    var newLang = getPathLanguage(newPath);
-
-    if (prevLang && newLang && prevLang !== newLang) {
-      var equiv = getEquivalentPath(prevPath, newLang);
-      if (equiv && equiv !== newPath) {
-        return equiv + (prevHash ? "#" + prevHash : "");
-      }
-    }
-    return null;
-  }
-
-  function extractPath(args) {
-    var url = args[2];
-    if (!url) return null;
-    try {
-      if (typeof url === "string" && url.startsWith("/")) return url.split("?")[0].split("#")[0];
-      var parsed = new URL(url, location.origin);
-      if (parsed.origin === location.origin) return parsed.pathname;
-    } catch (e) {}
-    return null;
-  }
-
-  function hidePageAndRedirect(redirect) {
-    clearPreviousUrl();
-    document.documentElement.style.visibility = "hidden";
-    location.replace(redirect);
-  }
-
-  document.addEventListener(
-    "click",
-    function (e) {
-      if (e.target.closest(LANGUAGE_TOGGLE_SELECTOR)) {
-        updateCurrent();
-      }
-    },
-    true,
-  );
-
-  if (!window.__langTogglePatched) {
-    window.__langTogglePatched = true;
-
-    var originalPushState = history.pushState;
-    var originalReplaceState = history.replaceState;
-
-    history.pushState = function () {
-      var targetPath = extractPath(arguments);
-      if (targetPath) {
-        var redirect = computeRedirect(targetPath);
-        if (redirect) {
-          hidePageAndRedirect(redirect);
-          return;
-        }
-      }
-      originalPushState.apply(this, arguments);
-      updateCurrent();
-    };
-
-    history.replaceState = function () {
-      var targetPath = extractPath(arguments);
-      if (targetPath) {
-        var redirect = computeRedirect(targetPath);
-        if (redirect) {
-          hidePageAndRedirect(redirect);
-          return;
-        }
-      }
-      originalReplaceState.apply(this, arguments);
-      updateCurrent();
-    };
-
-    window.addEventListener("popstate", function () { updateCurrent(); });
-  }
-
-  var pendingRedirect = (function () {
-    var previousUrl = getPreviousUrl();
-    if (!previousUrl) return null;
-    var prevLang = getPathLanguage(previousUrl.split("#")[0]);
+  function rewriteDropdownLinks(portal) {
     var currentLang = getPathLanguage(location.pathname);
-    if (prevLang && currentLang && prevLang !== currentLang) {
-      return computeRedirect(location.pathname);
-    }
-    return null;
-  })();
+    if (!currentLang) return;
 
-  if (pendingRedirect) {
-    hidePageAndRedirect(pendingRedirect);
-  } else {
-    updateCurrent();
+    var links = portal.querySelectorAll("a[href]");
+    for (var i = 0; i < links.length; i++) {
+      var link = links[i];
+      var href = link.getAttribute("href");
+      if (!href) continue;
+
+      var linkLang = getPathLanguage(href);
+      if (linkLang && linkLang !== currentLang) {
+        var equiv = getEquivalentPath(location.pathname, linkLang);
+        if (equiv) {
+          link.setAttribute("href", equiv + location.hash);
+        }
+      }
+    }
   }
+
+  var observer = new MutationObserver(function (mutations) {
+    for (var i = 0; i < mutations.length; i++) {
+      var added = mutations[i].addedNodes;
+      for (var j = 0; j < added.length; j++) {
+        var node = added[j];
+        if (node.nodeType !== 1) continue;
+        var portal = node.querySelector
+          ? node.querySelector("[data-radix-popper-content-wrapper]")
+          : null;
+        if (!portal && node.matches && node.matches("[data-radix-popper-content-wrapper]")) {
+          portal = node;
+        }
+        if (portal) {
+          rewriteDropdownLinks(portal);
+        }
+      }
+    }
+  });
+
+  observer.observe(document.body, { childList: true, subtree: true });
 })();
