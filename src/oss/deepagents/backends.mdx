@@ -261,7 +261,7 @@ Build a custom backend to project a remote or database filesystem (e.g., S3 or P
 Design guidelines:
 
 - Paths are absolute (`/x/y.txt`). Decide how to map them to your storage keys/rows.
-- Implement listing and glob efficiently (server-side filtering where available, otherwise local filter).
+- Implement`ls` and `glob` efficiently (server-side filtering where available, otherwise local filter).
 - For external persistence (S3, Postgres, etc.), return `files_update=None` (Python) or omit `filesUpdate` (JS) in write/edit results — only in-memory state backends need to return a files update dict.
 
 :::python
