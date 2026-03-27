@@ -268,6 +268,20 @@ var SDK_LOGOS = {
   svelte: `<svg width="14" height="14" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"><path d="M26.47,5.7A8.973,8.973,0,0,0,14.677,3.246L7.96,7.4a7.461,7.461,0,0,0-3.481,5.009,7.686,7.686,0,0,0,.8,5.058,7.358,7.358,0,0,0-1.151,2.8,7.789,7.789,0,0,0,1.4,6.028,8.977,8.977,0,0,0,11.794,2.458L24.04,24.6a7.468,7.468,0,0,0,3.481-5.009,7.673,7.673,0,0,0-.8-5.062,7.348,7.348,0,0,0,1.152-2.8A7.785,7.785,0,0,0,26.47,5.7" fill="#ff3e00"/><path d="M14.022,26.64A5.413,5.413,0,0,1,8.3,24.581a4.678,4.678,0,0,1-.848-3.625,4.307,4.307,0,0,1,.159-.61l.127-.375.344.238a8.76,8.76,0,0,0,2.628,1.274l.245.073-.025.237a1.441,1.441,0,0,0,.271.968,1.63,1.63,0,0,0,1.743.636,1.512,1.512,0,0,0,.411-.175l6.7-4.154a1.366,1.366,0,0,0,.633-.909,1.407,1.407,0,0,0-.244-1.091,1.634,1.634,0,0,0-1.726-.622,1.509,1.509,0,0,0-.413.176l-2.572,1.584a4.934,4.934,0,0,1-1.364.582,5.415,5.415,0,0,1-5.727-2.06A4.678,4.678,0,0,1,7.811,13.1,4.507,4.507,0,0,1,9.9,10.09l6.708-4.154a4.932,4.932,0,0,1,1.364-.581A5.413,5.413,0,0,1,23.7,7.414a4.679,4.679,0,0,1,.848,3.625,4.272,4.272,0,0,1-.159.61l-.127.375-.344-.237a8.713,8.713,0,0,0-2.628-1.274l-.245-.074.025-.237a1.438,1.438,0,0,0-.272-.968,1.629,1.629,0,0,0-1.725-.622,1.484,1.484,0,0,0-.411.176l-6.722,4.14a1.353,1.353,0,0,0-.631.908,1.394,1.394,0,0,0,.244,1.092,1.634,1.634,0,0,0,1.726.621,1.538,1.538,0,0,0,.413-.175l2.562-1.585a4.9,4.9,0,0,1,1.364-.581,5.417,5.417,0,0,1,5.728,2.059,4.681,4.681,0,0,1,.843,3.625A4.5,4.5,0,0,1,22.1,21.905l-6.707,4.154a4.9,4.9,0,0,1-1.364.581" fill="#fff"/></svg>`,
   angular: `<svg width="14" height="14" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg"><g clip-path="url(#a-clip)"><mask id="a-mask" style="mask-type:luminance" maskUnits="userSpaceOnUse" x="14" y="0" width="484" height="512"><path d="M14 0h484v512H14V0z" fill="#fff"/></mask><g mask="url(#a-mask)"><path d="M496 86l-18 272L312 0l184 86zM380 438l-124 72-126-72 24-62h202l24 62zM256 136l64 160H190l66-160zM32 358L14 86 198 0 32 358z" fill="url(#a-grad1)"/><path d="M496 86l-18 272L312 0l184 86zM380 438l-124 72-126-72 24-62h202l24 62zM256 136l64 160H190l66-160zM32 358L14 86 198 0 32 358z" fill="url(#a-grad2)"/></g></g><defs><linearGradient id="a-grad1" x1="120.4" y1="463.8" x2="504" y2="281.4" gradientUnits="userSpaceOnUse"><stop stop-color="#E40035"/><stop offset=".2" stop-color="#F60A48"/><stop offset=".4" stop-color="#F20755"/><stop offset=".5" stop-color="#DC087D"/><stop offset=".7" stop-color="#9717E7"/><stop offset="1" stop-color="#6C00F5"/></linearGradient><linearGradient id="a-grad2" x1="103" y1="61.4" x2="354" y2="348" gradientUnits="userSpaceOnUse"><stop stop-color="#FF31D9"/><stop offset="1" stop-color="#FF5BE1" stop-opacity="0"/></linearGradient><clipPath id="a-clip"><path fill="#fff" transform="translate(14)" d="M0 0h484v512H0z"/></clipPath></defs></svg>`
 };
+var PROD_AGENT_API_BASE = `${PROD_BASE}/api/langgraph`;
+function normalizeAgentServerBase(agentServer, useLocalPreview) {
+  const trimmed = agentServer.trim();
+  if (useLocalPreview) {
+    return "http://localhost:2024";
+  }
+  if (trimmed === "prod") {
+    return PROD_AGENT_API_BASE;
+  }
+  if (trimmed === "local") {
+    return PROD_AGENT_API_BASE;
+  }
+  return PROD_AGENT_API_BASE;
+}
 function isLocalhost() {
   if (typeof window === "undefined") return false;
   const { hostname } = window.location;
@@ -305,6 +319,9 @@ var CHEVRON_DOWN_SVG = `<svg width="12" height="12" viewBox="0 0 24 24" fill="no
 var TRACE_ICON_SVG = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>`;
 var TRACE_SPINNER_SVG = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="animate-spin"><circle cx="12" cy="12" r="10" opacity="0.25"/><path d="M12 2a10 10 0 0 1 10 10" stroke-linecap="round"/></svg>`;
 var EXTERNAL_LINK_SVG = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>`;
+var DOWNLOAD_SVG = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>`;
+var EXPAND_SVG = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>`;
+var CLOSE_SVG = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`;
 var LANG_TS_SVG = `<svg fill="none" height="18" viewBox="0 0 512 512" width="18" xmlns="http://www.w3.org/2000/svg"><rect fill="#3178c6" height="512" rx="50" width="512"/><rect fill="#3178c6" height="512" rx="50" width="512"/><path clip-rule="evenodd" d="m316.939 407.424v50.061c8.138 4.172 17.763 7.3 28.875 9.386s22.823 3.129 35.135 3.129c11.999 0 23.397-1.147 34.196-3.442 10.799-2.294 20.268-6.075 28.406-11.342 8.138-5.266 14.581-12.15 19.328-20.65s7.121-19.007 7.121-31.522c0-9.074-1.356-17.026-4.069-23.857s-6.625-12.906-11.738-18.225c-5.112-5.319-11.242-10.091-18.389-14.315s-15.207-8.213-24.18-11.967c-6.573-2.712-12.468-5.345-17.685-7.9-5.217-2.556-9.651-5.163-13.303-7.822-3.652-2.66-6.469-5.476-8.451-8.448-1.982-2.973-2.974-6.336-2.974-10.091 0-3.441.887-6.544 2.661-9.308s4.278-5.136 7.512-7.118c3.235-1.981 7.199-3.52 11.894-4.615 4.696-1.095 9.912-1.642 15.651-1.642 4.173 0 8.581.313 13.224.938 4.643.626 9.312 1.591 14.008 2.894 4.695 1.304 9.259 2.947 13.694 4.928 4.434 1.982 8.529 4.276 12.285 6.884v-46.776c-7.616-2.92-15.937-5.084-24.962-6.492s-19.381-2.112-31.066-2.112c-11.895 0-23.163 1.278-33.805 3.833s-20.006 6.544-28.093 11.967c-8.086 5.424-14.476 12.333-19.171 20.729-4.695 8.395-7.043 18.433-7.043 30.114 0 14.914 4.304 27.638 12.912 38.172 8.607 10.533 21.675 19.45 39.204 26.751 6.886 2.816 13.303 5.579 19.25 8.291s11.086 5.528 15.415 8.448c4.33 2.92 7.747 6.101 10.252 9.543 2.504 3.441 3.756 7.352 3.756 11.733 0 3.233-.783 6.231-2.348 8.995s-3.939 5.162-7.121 7.196-7.147 3.624-11.894 4.771c-4.748 1.148-10.303 1.721-16.668 1.721-10.851 0-21.597-1.903-32.24-5.71-10.642-3.806-20.502-9.516-29.579-17.13zm-84.159-123.342h64.22v-41.082h-179v41.082h63.906v182.918h50.874z" fill="#fff" fill-rule="evenodd"/></svg>`;
 var LANG_PYTHON_SVG = `<svg version="1.1" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://web.resource.org/cc/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="18px" height="18px" viewBox="0.21 -0.077 110 110" enable-background="new 0.21 -0.077 110 110" xml:space="preserve"><linearGradient id="SVGID_1_" gradientUnits="userSpaceOnUse" x1="63.8159" y1="56.6829" x2="118.4934" y2="1.8225" gradientTransform="matrix(1 0 0 -1 -53.2974 66.4321)"> <stop offset="0" style="stop-color:#387EB8"/> <stop offset="1" style="stop-color:#366994"/></linearGradient><path fill="url(#SVGID_1_)" d="M55.023-0.077c-25.971,0-26.25,10.081-26.25,12.156c0,3.148,0,12.594,0,12.594h26.75v3.781 c0,0-27.852,0-37.375,0c-7.949,0-17.938,4.833-17.938,26.25c0,19.673,7.792,27.281,15.656,27.281c2.335,0,9.344,0,9.344,0 s0-9.765,0-13.125c0-5.491,2.721-15.656,15.406-15.656c15.91,0,19.971,0,26.531,0c3.902,0,14.906-1.696,14.906-14.406 c0-13.452,0-17.89,0-24.219C82.054,11.426,81.515-0.077,55.023-0.077z M40.273,8.392c2.662,0,4.813,2.15,4.813,4.813 c0,2.661-2.151,4.813-4.813,4.813s-4.813-2.151-4.813-4.813C35.46,10.542,37.611,8.392,40.273,8.392z"/><linearGradient id="SVGID_2_" gradientUnits="userSpaceOnUse" x1="97.0444" y1="21.6321" x2="155.6665" y2="-34.5308" gradientTransform="matrix(1 0 0 -1 -53.2974 66.4321)"> <stop offset="0" style="stop-color:#FFE052"/> <stop offset="1" style="stop-color:#FFC331"/></linearGradient><path fill="url(#SVGID_2_)" d="M55.397,109.923c25.959,0,26.282-10.271,26.282-12.156c0-3.148,0-12.594,0-12.594H54.897v-3.781 c0,0,28.032,0,37.375,0c8.009,0,17.938-4.954,17.938-26.25c0-23.322-10.538-27.281-15.656-27.281c-2.336,0-9.344,0-9.344,0 s0,10.216,0,13.125c0,5.491-2.631,15.656-15.406,15.656c-15.91,0-19.476,0-26.532,0c-3.892,0-14.906,1.896-14.906,14.406 c0,14.475,0,18.265,0,24.219C28.366,100.497,31.562,109.923,55.397,109.923z M70.148,101.454c-2.662,0-4.813-2.151-4.813-4.813 s2.15-4.813,4.813-4.813c2.661,0,4.813,2.151,4.813,4.813S72.809,101.454,70.148,101.454z"/></svg>`;
 var SDK_OPTIONS = Object.keys(SDK_LABELS).map((k) => [k, SDK_LABELS[k]]);
@@ -349,9 +366,15 @@ var EMBED_CSS = `
 [data-lc-pe] .lc-tab{padding-left:10px;padding-right:10px}
 [data-lc-pe] .lc-sdk-btn{margin-left:auto}
 }
+[data-lc-pe] .lc-expand-btn{border:none;background:transparent;cursor:pointer;padding:6px;border-radius:6px;display:inline-flex;align-items:center;justify-content:center;color:#6B8299;transition:background-color 0.15s,color 0.15s}
+[data-lc-pe] .lc-expand-btn:hover{background-color:#E5F4FF;color:#030710}
+[data-lc-pe].dark .lc-expand-btn:hover{background-color:#1A2740;color:#C8DDF0}
+.lc-pe-backdrop{position:fixed;inset:0;z-index:9998;background:rgba(0,0,0,0.4);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
 `;
 
   const slotRef = useRef(null);
+  const cardRef = useRef(null);
+  const placeholderRef = useRef(null);
   const cachedRef = useRef(null);
   const useLocalPreview = agentServer === "local" || agentServer === "prod" && isLocalhost();
   const agentQuery = agentServer !== "local" && agentServer !== "prod" ? `?agentServer=${encodeURIComponent(agentServer)}` : "";
@@ -401,6 +424,9 @@ var EMBED_CSS = `
   );
   const [traceUrl, setTraceUrl] = useState(null);
   const [traceLoading, setTraceLoading] = useState(false);
+  const [expanded, setExpanded] = useState(false);
+  const expandedRef = useRef(false);
+  expandedRef.current = expanded;
   const [pageTheme, setPageTheme] = useState(detectPageTheme);
   useEffect(() => {
     setPageTheme(detectPageTheme());
@@ -498,6 +524,7 @@ var EMBED_CSS = `
       onReadyRef.current?.();
     });
     const unsubResize = host.onResize((h) => {
+      if (expandedRef.current) return;
       const clamped = Math.min(maxHeight, Math.max(minHeight, h));
       cached.lastHeight = clamped;
       setIframeHeight(clamped);
@@ -520,14 +547,19 @@ var EMBED_CSS = `
       setTraceLoading(false);
     });
     function syncPosition() {
-      const slot = slotRef.current;
-      if (!slot) return;
-      const rect = slot.getBoundingClientRect();
+      const slot2 = slotRef.current;
+      if (!slot2) return;
+      const rect = slot2.getBoundingClientRect();
       const { style } = iframe;
       style.top = `${rect.top}px`;
       style.left = `${rect.left}px`;
       style.width = `${rect.width}px`;
       style.setProperty("height", `${rect.height}px`, "important");
+      if (expandedRef.current) {
+        style.zIndex = "10000";
+      } else {
+        style.zIndex = "1";
+      }
     }
     syncPosition();
     const ro = new ResizeObserver(syncPosition);
@@ -558,6 +590,56 @@ var EMBED_CSS = `
       }, 200);
     };
   }, [cacheKey, previewUrl, agentQuery, defaultView, minHeight, maxHeight]);
+  useEffect(() => {
+    requestAnimationFrame(() => window.dispatchEvent(new Event("resize")));
+    if (!expanded) return;
+    const card = cardRef.current;
+    const placeholder = placeholderRef.current;
+    if (!card || !placeholder) return;
+    const wrapper = document.createElement("div");
+    wrapper.setAttribute("data-lc-pe", "");
+    wrapper.className = `${effectiveTheme === "dark" ? "dark" : ""}`;
+    document.body.appendChild(wrapper);
+    const backdrop = document.createElement("div");
+    backdrop.className = "lc-pe-backdrop";
+    backdrop.addEventListener("click", () => setExpanded(false));
+    wrapper.appendChild(backdrop);
+    wrapper.appendChild(card);
+    Object.assign(card.style, {
+      position: "fixed",
+      zIndex: "9999",
+      top: "50%",
+      left: "50%",
+      transform: "translate(-50%, -50%)",
+      width: "min(70vw, calc(100vw - 48px))",
+      height: "85vh",
+      display: "flex",
+      flexDirection: "column"
+    });
+    const handleKeyDown = (e) => {
+      if (e.key === "Escape") setExpanded(false);
+    };
+    document.addEventListener("keydown", handleKeyDown);
+    const pageWrapper = document.body.children[0];
+    const savedFilter = pageWrapper?.style.filter ?? "";
+    const savedPointerEvents = pageWrapper?.style.pointerEvents ?? "";
+    if (pageWrapper && pageWrapper !== wrapper) {
+      pageWrapper.style.filter = "blur(4px)";
+      pageWrapper.style.pointerEvents = "none";
+    }
+    requestAnimationFrame(() => window.dispatchEvent(new Event("resize")));
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+      if (pageWrapper && pageWrapper !== wrapper) {
+        pageWrapper.style.filter = savedFilter;
+        pageWrapper.style.pointerEvents = savedPointerEvents;
+      }
+      card.style.cssText = "";
+      placeholder.appendChild(card);
+      wrapper.remove();
+      requestAnimationFrame(() => window.dispatchEvent(new Event("resize")));
+    };
+  }, [expanded, effectiveTheme]);
   useEffect(() => {
     if (!ready || !cachedRef.current) return;
     setError(null);
@@ -596,7 +678,7 @@ var EMBED_CSS = `
       position: "fixed",
       top: `${rect.bottom + 4}px`,
       right: `${window.innerWidth - rect.right}px`,
-      zIndex: "10",
+      zIndex: expandedRef.current ? "10001" : "10",
       minWidth: "120px",
       borderRadius: "8px",
       border: `1px solid ${isDark ? "#1A2740" : "#B8DFFF"}`,
@@ -664,42 +746,41 @@ var EMBED_CSS = `
   const resolvedHeight = height ?? Math.min(maxHeight, Math.max(minHeight, iframeHeight));
   const heightStyle = typeof resolvedHeight === "number" ? `${resolvedHeight}px` : resolvedHeight;
   useEffect(() => {
-    slotRef.current?.style.setProperty("height", heightStyle, "important");
-  }, [heightStyle]);
+    if (!expanded) {
+      slotRef.current?.style.setProperty("height", heightStyle, "important");
+    } else {
+      slotRef.current?.style.removeProperty("height");
+    }
+  }, [heightStyle, expanded]);
   const tabBase = "lc-tab inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg border-none font-medium cursor-pointer transition-all duration-150";
   const tabActiveClass = `${tabBase} lc-tab-active shadow-sm`;
   const tabInactiveClass = `${tabBase} lc-tab-inactive`;
   const tabTraceActiveClass = `${tabBase} lc-tab-trace`;
   const tabTraceLoadingClass = `${tabBase} lc-tab-trace-loading`;
-  return <div data-lc-pe className={`${effectiveTheme === "dark" ? "dark" : ""} ${className ?? ""}`}>
-      <div className="rounded-2xl border lc-border overflow-hidden lc-bg-surface">
-        {
-    /* Tab bar */
-  }
-        {showCodeTab && <div className="lc-toolbar flex items-stretch justify-between px-3 py-2 border-b lc-border lc-bg-wash">
-            <div
+  const toolbar = showCodeTab && <div className="lc-toolbar flex items-stretch justify-between px-3 py-2 border-b lc-border lc-bg-wash">
+      <div
     className="inline-flex items-stretch gap-0.5 rounded-lg border lc-border lc-bg-surface"
     style={{ padding: 3 }}
   >
-              <button
+        <button
     type="button"
     aria-label="Preview"
     onClick={() => switchView("preview")}
     className={activeView === "preview" ? tabActiveClass : tabInactiveClass}
   >
-                <span dangerouslySetInnerHTML={{ __html: VIEW_EYE_SVG }} />
-                <span className="lc-tab-label">Preview</span>
-              </button>
-              <button
+          <span dangerouslySetInnerHTML={{ __html: VIEW_EYE_SVG }} />
+          <span className="lc-tab-label">Preview</span>
+        </button>
+        <button
     type="button"
     aria-label="Code"
     onClick={() => switchView("code")}
     className={activeView === "code" ? tabActiveClass : tabInactiveClass}
   >
-                <span dangerouslySetInnerHTML={{ __html: VIEW_CODE_SVG }} />
-                <span className="lc-tab-label">Code</span>
-              </button>
-              {(traceUrl || traceLoading) && !useLocalPreview && <a
+          <span dangerouslySetInnerHTML={{ __html: VIEW_CODE_SVG }} />
+          <span className="lc-tab-label">Code</span>
+        </button>
+        {(traceUrl || traceLoading) && !useLocalPreview && <a
     href={traceUrl ?? "#"}
     target="_blank"
     rel="noopener noreferrer"
@@ -711,83 +792,125 @@ var EMBED_CSS = `
     className={traceUrl ? tabTraceActiveClass : tabTraceLoadingClass}
     aria-disabled={!traceUrl}
   >
-                  <span
+            <span
     dangerouslySetInnerHTML={{
       __html: traceUrl ? TRACE_ICON_SVG : TRACE_SPINNER_SVG
     }}
   />
-                  <span className="lc-tab-label">Trace</span>
-                  {traceUrl && <span
-    className="ml-0.5"
-    dangerouslySetInnerHTML={{ __html: EXTERNAL_LINK_SVG }}
-  />}
-                </a>}
-            </div>
+            <span className="lc-tab-label">Trace</span>
+            {traceUrl && <span className="ml-0.5" dangerouslySetInnerHTML={{ __html: EXTERNAL_LINK_SVG }} />}
+          </a>}
+      </div>
 
-            {
-    /* Language switcher (JS | Python) — only visible in code view */
-  }
-            {activeView === "code" && <div
+      {activeView === "code" && <div
     className="lc-lang-switcher inline-flex items-stretch gap-0.5 rounded-lg border lc-border lc-bg-surface"
     style={{ padding: 3 }}
   >
-                <button
+          <button
     type="button"
     aria-label="TypeScript"
     onClick={() => setAgentLang("js")}
     className={agentLang === "js" ? tabActiveClass : tabInactiveClass}
     title="TypeScript / JavaScript"
   >
-                  <span dangerouslySetInnerHTML={{ __html: LANG_TS_SVG }} />
-                </button>
-                <button
+            <span dangerouslySetInnerHTML={{ __html: LANG_TS_SVG }} />
+          </button>
+          <button
     type="button"
     aria-label="Python"
     onClick={() => setAgentLang("python")}
     className={agentLang === "python" ? tabActiveClass : tabInactiveClass}
     title="Python"
   >
-                  <span dangerouslySetInnerHTML={{ __html: LANG_PYTHON_SVG }} />
-                </button>
-              </div>}
+            <span dangerouslySetInnerHTML={{ __html: LANG_PYTHON_SVG }} />
+          </button>
+        </div>}
 
-            {
+      <div className="inline-flex items-center gap-1.5">
+        <button
+    type="button"
+    aria-label={expanded ? "Collapse" : "Expand"}
+    onClick={() => setExpanded((v) => !v)}
+    className="lc-expand-btn"
+    title={expanded ? "Collapse" : "Expand"}
+  >
+          <span dangerouslySetInnerHTML={{ __html: expanded ? CLOSE_SVG : EXPAND_SVG }} />
+        </button>
+
+        {
+    /* Download button */
+  }
+        <button
+    type="button"
+    aria-label="Download project"
+    title="Download project to run locally"
+    onClick={() => {
+      const base = normalizeAgentServerBase(agentServer, useLocalPreview);
+      const params = new URLSearchParams({ sdk, lang: agentLang });
+      const url = `${base}/api/download/${encodeURIComponent(pattern)}?${params}`;
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${pattern}.zip`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      cachedRef.current?.host.trackEvent("download_clicked", {
+        pattern,
+        sdk,
+        lang: agentLang
+      });
+    }}
+    className="lc-expand-btn"
+  >
+          <span dangerouslySetInnerHTML={{ __html: DOWNLOAD_SVG }} />
+        </button>
+
+        {
     /* SDK selector — dropdown is appended to document.body via effect */
   }
-            <button
+        <button
     ref={sdkButtonRef}
     type="button"
     onClick={() => setSdkDropdownOpen((o) => !o)}
     className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border lc-sdk-btn font-medium cursor-pointer transition-colors"
   >
-              <span dangerouslySetInnerHTML={{ __html: SDK_LOGOS[sdk] }} />
-              {SDK_LABELS[sdk]}
-              <span dangerouslySetInnerHTML={{ __html: CHEVRON_DOWN_SVG }} />
-            </button>
-          </div>}
+          <span dangerouslySetInnerHTML={{ __html: SDK_LOGOS[sdk] }} />
+          {SDK_LABELS[sdk]}
+          <span dangerouslySetInnerHTML={{ __html: CHEVRON_DOWN_SVG }} />
+        </button>
+      </div>
+    </div>;
+  const slot = <div
+    ref={slotRef}
+    className="relative w-full"
+    style={expanded ? { flex: 1, minHeight: 0 } : { height: heightStyle }}
+  >
+      {!ready && !error && <div className="absolute inset-0 flex items-center justify-center z-10 lc-bg-wash">
+          <div className="size-6 border-2 lc-spinner rounded-full animate-spin" />
+        </div>}
 
-        {
-    /* Slot: the fixed iframe is positioned over this div */
-  }
-        <div ref={slotRef} className="relative w-full" style={{ height: heightStyle }}>
-          {!ready && !error && <div className="absolute inset-0 flex items-center justify-center z-10 lc-bg-wash">
-              <div className="size-6 border-2 lc-spinner rounded-full animate-spin" />
-            </div>}
-
-          {error && <div className="absolute top-3 inset-x-3 z-10 px-4 py-3 rounded-2xl border lc-error text-sm">
-              <strong>Preview Error</strong>
-              <p className="mt-1 opacity-80" style={{ fontSize: 13 }}>
-                {error}
-              </p>
-              <button
+      {error && <div className="absolute top-3 inset-x-3 z-10 px-4 py-3 rounded-2xl border lc-error text-sm">
+          <strong>Preview Error</strong>
+          <p className="mt-1 opacity-80" style={{ fontSize: 13 }}>
+            {error}
+          </p>
+          <button
     type="button"
     onClick={handleReset}
     className="mt-2 px-3 py-1 text-xs rounded-lg border lc-error-btn cursor-pointer"
   >
-                Retry
-              </button>
-            </div>}
-        </div>
+            Retry
+          </button>
+        </div>}
+    </div>;
+  return <div
+    data-lc-pe
+    ref={placeholderRef}
+    className={`${effectiveTheme === "dark" ? "dark" : ""} ${className ?? ""}`}
+  >
+      <div ref={cardRef} className="rounded-2xl border lc-border overflow-hidden lc-bg-surface">
+        {toolbar}
+        {slot}
       </div>
     </div>;
 
