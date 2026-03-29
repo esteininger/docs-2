@@ -847,7 +847,7 @@ var EMBED_CSS = `
     onClick={() => {
       const base = normalizeAgentServerBase(agentServer, useLocalPreview);
       const params = new URLSearchParams({ sdk, lang: agentLang });
-      const url = `${base}/api/download/${encodeURIComponent(pattern)}?${params}`;
+      const url = `${base}/download/${encodeURIComponent(pattern)}?${params}`;
       const a = document.createElement("a");
       a.href = url;
       a.download = `${pattern}.zip`;
