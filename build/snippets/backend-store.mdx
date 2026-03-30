@@ -3,7 +3,10 @@ from langgraph.store.memory import InMemoryStore
 from deepagents.backends import StoreBackend
 
 agent = create_deep_agent(
-    backend=(lambda rt: StoreBackend(rt)),
+    backend=lambda rt: StoreBackend(
+        rt,
+        namespace=lambda ctx: (ctx.runtime.context.user_id,),
+    ),
     store=InMemoryStore()  # Good for local dev; omit for LangSmith Deployment
 )
 ```
