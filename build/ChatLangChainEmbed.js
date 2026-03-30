@@ -259,9 +259,6 @@ html.${ROOT_OPEN_CLASS} #lc-chat-widget-panel { transform: translateX(0); }
       style.textContent = WIDGET_CSS;
       document.head.appendChild(style);
     }
-    var triggerLink = document.querySelector(
-      'a[href^="https://chat.langchain.com"]'
-    );
     var panel = document.createElement("aside");
     panel.id = "lc-chat-widget-panel";
     panel.setAttribute("aria-label", "Chat LangChain");
@@ -441,12 +438,33 @@ html.${ROOT_OPEN_CLASS} #lc-chat-widget-panel { transform: translateX(0); }
         iframe.contentWindow.postMessage({ type: "CHAT_LC_SET_HISTORY_VIEW", open: false }, "*");
       }
     }
-    if (triggerLink) {
-      triggerLink.addEventListener("click", function(e) {
+    document.addEventListener(
+      "click",
+      function lcChatTriggerCapture(e) {
+        var t = e.target;
+        if (!(t instanceof Element)) return;
+        var anchor = t.closest('a[href^="https://chat.langchain.com"]');
+        if (!anchor || anchor.closest("#lc-chat-widget-panel")) return;
         e.preventDefault();
         openPanel();
-      });
+      },
+      true
+    );
+    var origPushState = history.pushState.bind(history);
+    var origReplaceState = history.replaceState.bind(history);
+    function afterDocNav() {
+      queueMicrotask(sendPageContext);
     }
+    history.pushState = function(data, unused, url) {
+      var r = origPushState(data, unused, url);
+      afterDocNav();
+      return r;
+    };
+    history.replaceState = function(data, unused, url) {
+      var r = origReplaceState(data, unused, url);
+      afterDocNav();
+      return r;
+    };
     closeButton.addEventListener("click", closePanel);
     newThreadButton.addEventListener("click", startNewThread);
     window.addEventListener("keydown", function handleKeydown(event) {
