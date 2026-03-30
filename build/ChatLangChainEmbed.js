@@ -233,6 +233,13 @@ html.${ROOT_OPEN_CLASS} #lc-chat-widget-panel { transform: translateX(0); }
 @media (max-width: 768px) {
   #lc-chat-widget-resize-handle { display: none; }
 }
+/* Mintlify "On this page" (#content-side-layout) uses full viewport width for layout;
+   hide it while the chat panel is open so the main column is not squeezed on viewports < 1800px. */
+@media (max-width: 1799px) {
+  html.${ROOT_OPEN_CLASS} #content-side-layout {
+    display: none !important;
+  }
+}
 `
   );
   function ChatLangChainEmbed({
