@@ -226,7 +226,7 @@ Graph state is scoped to a thread by design, so updates are safe under concurren
 
 **Do this:**
 
-```python
+:```python
 class CustomMiddleware(AgentMiddleware):
     def __init__(self):
         pass
@@ -234,10 +234,13 @@ class CustomMiddleware(AgentMiddleware):
     def before_agent(self, state, runtime):
         return {"x": state.get("x", 0) + 1}  # Update graph state instead
 ```
+:
+
+::
 
 Do **not** do this:
 
-```python
+:```python
 class CustomMiddleware(AgentMiddleware):
     def __init__(self):
         self.x = 1
@@ -245,8 +248,13 @@ class CustomMiddleware(AgentMiddleware):
     def before_agent(self, state, runtime):
         self.x += 1  # Mutation causes race conditions
 ```
+:
 
-Mutation in place—such as modifying `self.x` in `before_agent` or other hooks—can lead to subtle bugs and race conditions, because many operations run concurrently (subagents, parallel tools, and parallel invocations on different threads).
+::
+
+Mutation in place, such as modifying `self.x` in `before_agent` or changing other shared values in hooks, can lead to subtle bugs and race conditions because many operations run concurrently (subagents, parallel tools, and parallel invocations on different threads).
+
+
 
 For full details on extending state with custom properties, see [Custom middleware - Custom state schema](/oss/python/langchain/middleware/custom#custom-state-schema).
 If you must use mutation in custom middleware, consider what happens when subagents, parallel tools, or concurrent agent invocations run at the same time.
