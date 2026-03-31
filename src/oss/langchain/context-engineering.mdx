@@ -64,7 +64,7 @@ Throughout this process, your agent accesses (reads / writes) different sources 
 
 | Data Source | Also Known As | Scope | Examples |
 |-------------|---------------|-------|----------|
-| **Runtime Context** | Static configuration | Conversation-scoped | User ID, API keys, database connections, permissions, environment settings |
+| **Runtime Context** | Static configuration | Conversation-scoped | User ID, database connections, permissions, environment settings |
 | **State** | Short-term memory | Conversation-scoped | Current messages, uploaded files, authentication status, tool results |
 | **Store** | Long-term memory | Cross-conversation | User preferences, extracted insights, memories, historical data |
 
@@ -1587,7 +1587,7 @@ Tools can also fetch important information for the model that allows it to perfo
 
 ### Reads
 
-Most real-world tools need more than just the LLM's parameters. They need user IDs for database queries, API keys for external services, or current session state to make decisions. Tools read from state, store, and runtime context to access this information.
+Most real-world tools need more than just the LLM's parameters. They need user IDs for database queries, or current session state to make decisions. Tools read from state, store, and runtime context to access this information.
 
 <Tabs>
   <Tab title="State">
@@ -1728,7 +1728,7 @@ Most real-world tools need more than just the LLM's parameters. They need user I
   </Tab>
 
   <Tab title="Runtime Context">
-    Read from Runtime Context for configuration like API keys and user IDs:
+    Read from Runtime Context for configuration like user IDs:
 
     :::python
 
@@ -1740,7 +1740,6 @@ Most real-world tools need more than just the LLM's parameters. They need user I
     @dataclass
     class Context:
         user_id: str
-        api_key: str
         db_connection: str
 
     @tool
@@ -1751,11 +1750,10 @@ Most real-world tools need more than just the LLM's parameters. They need user I
         """Fetch data using Runtime Context configuration."""
         # Read from Runtime Context: get API key and DB connection
         user_id = runtime.context.user_id
-        api_key = runtime.context.api_key
         db_connection = runtime.context.db_connection
 
         # Use configuration to fetch data
-        results = perform_database_query(db_connection, query, api_key)
+        results = perform_database_query(db_connection, query)
 
         return f"Found {len(results)} results for user {user_id}"
 
@@ -1770,7 +1768,6 @@ Most real-world tools need more than just the LLM's parameters. They need user I
         {"messages": [{"role": "user", "content": "Get my data"}]},
         context=Context(
             user_id="user_123",
-            api_key="sk-...",
             db_connection="postgresql://..."
         )
     )
@@ -1786,17 +1783,16 @@ Most real-world tools need more than just the LLM's parameters. They need user I
 
     const contextSchema = z.object({
       userId: z.string(),
-      apiKey: z.string(),
       dbConnection: z.string(),
     });
 
     const fetchUserData = tool(
       async ({ query }, runtime: ToolRuntime<any, typeof contextSchema>) => {
         // Read from Runtime Context: get API key and DB connection
-        const { userId, apiKey, dbConnection } = runtime.context;
+        const { userId, dbConnection } = runtime.context;
 
         // Use configuration to fetch data
-        const results = await performDatabaseQuery(dbConnection, query, apiKey);
+        const results = await performDatabaseQuery(dbConnection, query);
 
         return `Found ${results.length} results for user ${userId}`;
       },
