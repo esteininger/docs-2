@@ -104,7 +104,7 @@ def run_claude(prompt: str):
         env={
             **os.environ,
             "TRACE_TO_LANGSMITH": "true",
-            "CC_LANGSMITH_API_KEY": "...",
+            "CC_LANGSMITH_API_KEY": "<LangSmith API key>",
             "CC_LANGSMITH_PROJECT": "claude-code",
             "CC_LANGSMITH_PARENT_DOTTED_ORDER": run_tree.dotted_order,
         },
