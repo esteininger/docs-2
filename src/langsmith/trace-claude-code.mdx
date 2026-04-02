@@ -118,7 +118,7 @@ import { traceable, getCurrentRunTree } from "langsmith/traceable";
 import { execSync } from "node:child_process";
 
 process.env.LANGSMITH_TRACING = "true";
-process.env.LANGSMITH_API_KEY = "...";
+process.env.LANGSMITH_API_KEY = "<LangSmith API key>";
 process.env.LANGSMITH_PROJECT = "claude-code";
 
 const runClaude = traceable(
