@@ -7,7 +7,7 @@ This guide shows you how to automatically send conversations from the [Claude Co
 
 ![](/langsmith/images/example-claude-code-plugin-trace.png)
 
-Once configured, each Claude Code project can opt in to sending traces to LangSmith. Each trace includes user messages, tool calls, and assistant responses. System prompts are not included, because Claude Code does not return them in conversation transcripts.
+Once configured, each Claude Code project can opt in to sending traces to LangSmith. Each trace includes user messages, tool calls, compaction, subagent runs, and assistant responses. System prompts are not included, because Claude Code does not return them in conversation transcripts.
 
 ## Prerequisites
 
@@ -15,7 +15,7 @@ Before setting up tracing, ensure you have:
 
 - [**Claude Code CLI**](https://code.claude.com/docs/en/overview) installed.
 - A [**LangSmith API key**](https://smith.langchain.com/settings/apikeys).
-- [Node.js](https://nodejs.org/) installed.
+- [**Node.js**](https://nodejs.org/) installed.
 
 
 ## Getting started
@@ -30,7 +30,7 @@ From within Claude Code, run:
 
 To update the plugin, run:
 
-```
+```bash
 /plugin marketplace update langsmith-claude-code-plugins
 /reload-plugins
 ```
@@ -48,7 +48,7 @@ The plugin requires the following environment variables:
 - `CC_LANGSMITH_PROJECT` - The LangSmith project name where traces are sent
 - (optional) `CC_LANGSMITH_DEBUG: "true"` - Enables detailed debug logging. Remove or set to `false` to disable tracing.
 
-The easiest way to get set up is to create or edit [Claude Code's project settings file](https://code.claude.com/docs/en/settings#:~:text=Project%20settings%20are%20saved%20in%20your%20project%20directory%3A). Create a `.claude/settings.local.json` in your project directory:
+The easiest way to get set up is to create or edit [Claude Code's project settings file](https://code.claude.com/docs/en/settings#:~:text=Project%20settings%20are%20saved%20in%20your%20project%20directory%3A). Create a `.claude/settings.local.json` in your project directory and populate it as follows:
 
 ```json
 {
@@ -60,17 +60,17 @@ The easiest way to get set up is to create or edit [Claude Code's project settin
 }
 ```
 
+<Note> Alternatively, to enable tracing to LangSmith for all Claude Code sessions, you can add the above JSON to your [global Claude Code settings.json](https://code.claude.com/docs/en/settings#:~:text=User%20settings%20are%20defined%20in%20~/.claude/settings.json%20and%20apply%20to%20all%20projects.) file. </Note>
+
 **Option 2: Export to shell**
 
-Add to your `~/.zshrc`, `~/.bashrc`, or `~/.bash_profile`:
+Run the following commands in your shell or add them to your `~/.zshrc`, `~/.bashrc`, or `~/.bash_profile`:
 
 ```bash
 export TRACE_TO_LANGSMITH="true"
 export CC_LANGSMITH_API_KEY="lsv2_pt_..."
 export CC_LANGSMITH_PROJECT="my-project"
 ```
-
-<Note> Alternatively, to enable tracing to LangSmith for all Claude Code sessions, you can add the above JSON to your [global Claude Code settings.json](https://code.claude.com/docs/en/settings#:~:text=User%20settings%20are%20defined%20in%20~/.claude/settings.json%20and%20apply%20to%20all%20projects.) file. </Note>
 
 ## Verify setup
 
@@ -150,11 +150,6 @@ Your outer run (chain)
     └── Claude (llm)
 ```
 
-## Known limitations
-
-Currently, subagents are only traced upon completion. This means if you interrupt a conversation turn during a subagent run,
-the subagent runs will not be traced.
-
 ## Troubleshooting
 
 ### No traces appearing in LangSmith
@@ -179,6 +174,10 @@ the subagent runs will not be traced.
    }
    ```
    Then check logs for API calls and HTTP status codes.
+
+### Subagent runs do not appear after user interruption
+Currently, subagents are only traced upon completion. This means if you interrupt a conversation turn in the middle of a subagent run,
+the subagent's child runs will not be traced.
 
 ### Managing log file size
 
