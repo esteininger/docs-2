@@ -834,7 +834,8 @@
                       "pages": [
                         "langsmith/fleet/self-hosted",
                         "langsmith/insights-self-hosted",
-                        "langsmith/polly-self-hosted"
+                        "langsmith/polly-self-hosted",
+                        "langsmith/llm-auth-proxy-self-hosted"
                       ]
                     },
                     {
