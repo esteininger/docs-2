@@ -1,10 +1,9 @@
 ---
-title: Custom model providers
-sidebarTitle: Model providers
+title: Model providers
 description: Configure any LangChain-compatible model provider for the Deep Agents CLI
 ---
 
-The Deep Agents CLI supports any [chat model provider compatible with LangChain](/oss/javascript/langchain/models), unlocking use for virtually any LLM that supports tool calling. Any service that exposes an OpenAI-compatible or Anthropic-compatible API also works out of the box—see [Compatible APIs](/oss/javascript/deepagents/cli/configuration#compatible-apis).
+The Deep Agents CLI supports any [chat model provider compatible with LangChain](/oss/javascript/integrations/chat), unlocking use for virtually any LLM that supports tool calling. Any service that exposes an OpenAI-compatible or Anthropic-compatible API also works out of the box—see [Compatible APIs](/oss/javascript/deepagents/cli/configuration#compatible-apis).
 
 ## Quick start
 
@@ -12,14 +11,15 @@ The CLI integrates automatically with the [following model providers](#provider-
 
 1. **Install provider packages**
 
-    Each model provider requires installing its corresponding LangChain integration package. These are available as optional extras when installing the CLI:
+    Each model provider requires installing its corresponding LangChain integration package. These are available as optional extras when installing the CLI, done intentionally to keep the application lightweight:
 
     ```bash
-    # Quick install with chosen providers (OpenAI included automatically)
-    DEEPAGENTS_EXTRAS="anthropic,groq" curl -LsSf https://raw.githubusercontent.com/langchain-ai/deepagents/refs/heads/main/libs/cli/scripts/install.sh | bash
+    # Quick install with chosen providers
+    # OpenAI, Anthropic, and Gemini are included by default
+    DEEPAGENTS_EXTRAS="baseten,groq" curl -LsSf https://raw.githubusercontent.com/langchain-ai/deepagents/refs/heads/main/libs/cli/scripts/install.sh | bash
 
     # Or install directly with uv
-    uv tool install 'deepagents-cli[anthropic,groq]'
+    uv tool install 'deepagents-cli[baseten,groq]'
 
     # Add additional packages at a later date
     uv tool install deepagents-cli --with langchain-ollama
@@ -34,6 +34,31 @@ The CLI integrates automatically with the [following model providers](#provider-
 
 
 
+### Model routers and proxies
+
+Model routers like [OpenRouter](https://openrouter.ai/) and [LiteLLM](https://docs.litellm.ai/) provide access to models from multiple providers through a single endpoint.
+
+Use the dedicated integration packages for these services:
+
+
+
+| Router | Package |
+| --- | --- |
+| OpenRouter | [`langchain-openrouter`](/oss/javascript/integrations/chat/openrouter) |
+
+
+**OpenRouter** is a built-in provider—install the package and use it directly:
+
+```bash
+uv tool install 'deepagents-cli[openrouter]'
+```
+
+**LiteLLM** is also a built-in provider:
+
+```bash
+uv tool install 'deepagents-cli[litellm]'
+```
+
 ### Switching models
 
 To switch models in the CLI, either:
@@ -41,21 +66,23 @@ To switch models in the CLI, either:
 1. **Use the interactive model switcher** with the `/model` command. This displays available models sourced from each installed LangChain provider package's [model profiles](/oss/javascript/langchain/models#model-profiles).
 
     <Note>
-        These profiles are not an exhaustive list of available models. If the model you want isn't shown, use option 2 instead (useful for newly released models that haven't been added to the profiles yet). See [Which models appear in the switcher](#which-models-appear-in-the-switcher) for the full set of criteria.
+        These profiles are not an exhaustive list of available models. If the model you want isn't shown, use option 2 instead (useful for newly released models that haven't been added to the profiles yet).
+
+        See [Which models appear in the switcher](#which-models-appear-in-the-switcher) for the full set of criteria.
     </Note>
-2. **Specify a model name directly** as an argument, e.g. `/model openai:gpt-4o`. You can use any model supported by the chosen provider, regardless of whether it appears in the list from option 1. The model name will be passed to the API request.
+2. **Specify a model name directly** as an argument, e.g. `/model gpt-5.4`. You can use any model supported by the chosen provider, regardless of whether it appears in the list from option 1. The model name will be passed to the API request.
 3. **Specify the model at launch** via `--model`, e.g.
 
     ```txt
-    deepagents --model openai:gpt-4o
+    deepagents --model openai:gpt-5.4
     ```
 
 ### Which models appear in the switcher
 
 The interactive `/model` selector builds its list dynamically—it is not a hardcoded list baked into the CLI. A model appears in the switcher when **all** of the following are true:
 
-1. **The provider package is installed.** Each provider (e.g. `langchain-anthropic`, `langchain-openai`) must be installed alongside `deepagents-cli`—either as an [install extra](/oss/javascript/deepagents/cli/providers#quick-start) (e.g. `uv tool install 'deepagents-cli[anthropic]'`) or added later with `uv tool install deepagents-cli --with <package>`. If a package is missing, its entire provider section is absent from the switcher.
-2. **The model has a profile with `tool_calling` enabled.** The CLI is a tool-calling agent, so it filters out models that don't support tool calling, as indicated in their profile data. This is the most common reason a model is missing from the list. For providers that don't bundle profiles (see the [Provider reference](#provider-reference) table), you can define one in `config.toml`:
+1. **The provider package is installed.** Each provider (e.g. `langchain-anthropic`, `langchain-openai`) must be installed alongside `deepagents-cli`—either as an [install extra](/oss/javascript/deepagents/cli/providers#quick-start) (e.g. `uv tool install 'deepagents-cli[ollama]'`) or added later with `uv tool install deepagents-cli --with <package>`. If a package is missing, its entire provider section is absent from the switcher.
+2. **The model has a profile with `tool_calling` enabled.** The CLI requires tool-calling support, so models without `tool_calling: true` in their profile are excluded. This is the most common reason a model is missing from the list. For providers that don't bundle profiles (see the [Provider reference](#provider-reference) table), you can define one in `config.toml`:
 
     ```toml
     [models.providers.ollama.profile."qwen3:4b"]
@@ -124,31 +151,6 @@ When the CLI launches, it resolves which model to use in the following order:
 4. **Environment auto-detection**: Falls back to the first available startup credential, checked in order: `OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, `GOOGLE_API_KEY`, `GOOGLE_CLOUD_PROJECT` (Vertex AI).
 
 This startup fallback intentionally checks only those four credentials. Other supported providers (for example, Groq) are still available via `--model`, `/model`, and saved defaults (`[models].default` / `[models].recent`).
-
-### Model routers and proxies
-
-Model routers like [OpenRouter](https://openrouter.ai/) and [LiteLLM](https://docs.litellm.ai/) provide access to models from multiple providers through a single endpoint.
-
-Use the dedicated integration packages for these services:
-
-
-
-| Router | Package |
-| --- | --- |
-| OpenRouter | [`langchain-openrouter`](/oss/javascript/integrations/chat/openrouter) |
-
-
-**OpenRouter** is a built-in provider—install the package and use it directly:
-
-```bash
-uv tool install 'deepagents-cli[openrouter]'
-```
-
-**LiteLLM** is also a built-in provider:
-
-```bash
-uv tool install 'deepagents-cli[litellm]'
-```
 
 ---
 
