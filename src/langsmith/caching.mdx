@@ -4,12 +4,12 @@ sidebarTitle: Caching
 description: Cache values server-side in your agent deployment using stale-while-revalidate and key-value cache APIs.
 ---
 
-Agents deployed on [Agent Server](/langsmith/agent-server) often call external services — config stores, auth providers, feature-flag systems — that return data you don't need to re-fetch on every invocation. The built-in cache lets you store those results server-side so subsequent runs read from memory instead of making redundant network calls.
+Agents deployed on [Agent Server](/langsmith/agent-server) often call external services—config stores, auth providers, feature-flag systems—that return data you don't need to re-fetch on every invocation. The built-in cache lets you store those results server-side so subsequent runs read from memory instead of making redundant network calls.
 
 The cache exposes two layers:
 
-- **`swr`** — stale-while-revalidate. Pass a key and an async loader; the server caches the result, serves it on future reads, and revalidates in the background when the entry goes stale. Use this for most caching needs.
-- **`cache_get` / `cache_set`** — low-level key-value API for when you need manual control over reads and writes.
+- **`swr`**: stale-while-revalidate. Pass a key and an async loader; the server caches the result, serves it on future reads, and revalidates in the background when the entry goes stale. Use this for most caching needs.
+- **`cache_get` / `cache_set`**: low-level key-value API for when you need manual control over reads and writes.
 
 All cache APIs are server-side only and require the Agent Server runtime. Values must be JSON-serializable.
 
@@ -122,7 +122,7 @@ async def authenticate(headers: dict) -> Auth.types.MinimalUserDict:
     return result.value
 ```
 
-With this setup, the server returns the cached user for 5 minutes without contacting the identity provider. After that it revalidates in the background for up to 1 hour. After 1 hour, the next request blocks until `validate_token` completes.
+With this setup, the server returns the cached user for 5 minutes without contacting the identity provider. After that, it revalidates in the background for up to 1 hour. After 1 hour, the next request blocks until `validate_token` completes.
 
 ## Use with Pydantic models
 
