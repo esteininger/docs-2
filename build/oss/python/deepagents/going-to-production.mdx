@@ -91,16 +91,20 @@ When your agent needs to call external APIs on behalf of a user (e.g., reading t
 
 ```python
 from langchain_auth import Client
+from langchain.tools import tool, ToolRuntime
 
 auth_client = Client()
 
 # Inside your agent's tool:
-auth_result = await auth_client.authenticate(
-    provider="github",
-    scopes=["repo", "read:org"],
-    user_id=config["configurable"]["langgraph_auth_user_id"],
-)
-# Use auth_result.token for GitHub API calls on the user's behalf
+@tool
+async def github_action(runtime: ToolRuntime):
+    """Perform an action on behalf of the user via GitHub."""
+    auth_result = await auth_client.authenticate(
+        provider="github",
+        scopes=["repo", "read:org"],
+        user_id=runtime.server_info.user.identity,  # [!code highlight]
+    )
+    # Use auth_result.token for GitHub API calls on the user's behalf
 ```
 
 
@@ -160,6 +164,13 @@ Shared memory (assistant, user, or organization scope) is a vector for prompt in
 
 In Deep Agents, memory is stored as files in a virtual filesystem. By default, files only last for a single conversation. To persist them, route a path like `/memories/` to a [StoreBackend](https://reference.langchain.com/python/deepagents/backends/store/StoreBackend) that writes to the LangGraph [Store](/langsmith/custom-store). Use a [CompositeBackend](https://reference.langchain.com/python/deepagents/backends/composite/CompositeBackend) to give the agent both ephemeral scratch space and persistent [long-term memory](/oss/python/deepagents/memory).
 
+<Note>
+The `ctx.runtime.server_info` and `ctx.runtime.execution_info` namespace patterns shown below require `deepagents>=0.5.0`.
+</Note>
+
+
+
+
 <Tabs>
   <Tab title="User (recommended)">
     Namespace by `user_id`. Each user gets their own private memory. This is the recommended default since most applications deploy a single assistant.
@@ -173,7 +184,10 @@ agent = create_deep_agent(
         default=StateBackend(),
         routes={
             "/memories/": StoreBackend(
-                namespace=lambda ctx: (ctx.runtime.context.user_id,),
+                namespace=lambda ctx: (
+                    ctx.runtime.server_info.assistant_id,  # [!code highlight]
+                    ctx.runtime.server_info.user.identity,  # [!code highlight]
+                ),
             ),
         },
     ),
@@ -195,7 +209,6 @@ agent = create_deep_agent(
 ```python agent.py
 from deepagents import create_deep_agent
 from deepagents.backends import CompositeBackend, StateBackend, StoreBackend
-from langgraph.config import get_config
 
 agent = create_deep_agent(
     backend=CompositeBackend(
@@ -203,7 +216,7 @@ agent = create_deep_agent(
         routes={
             "/memories/": StoreBackend(
                 namespace=lambda ctx: (
-                    get_config()["metadata"]["assistant_id"],
+                    ctx.runtime.server_info.assistant_id,  # [!code highlight]
                 ),
             ),
         },
@@ -215,7 +228,30 @@ agent = create_deep_agent(
 
 
   </Tab>
-  <Tab title="Global">
+  <Tab title="User">
+    Namespace by `user_id` alone. Memory follows the user across all assistants. Use this for a global user profile (name, timezone, communication preferences) that should apply regardless of which assistant the user is talking to.
+
+```python agent.py
+from deepagents import create_deep_agent
+from deepagents.backends import CompositeBackend, StateBackend, StoreBackend
+
+agent = create_deep_agent(
+    backend=CompositeBackend(
+        default=StateBackend(),
+        routes={
+            "/memories/": StoreBackend(
+                namespace=lambda ctx: (ctx.runtime.server_info.user.identity,),  # [!code highlight]
+            ),
+        },
+    ),
+)
+```
+
+
+
+
+  </Tab>
+  <Tab title="Organization">
     Namespace by `org_id`. Memory is shared across all users and all assistants. Typically used for organization-wide policies (compliance rules, brand guidelines) that should be read-only for the agent. Write access should be restricted to application code to prevent prompt injection.
 
 ```python agent.py
@@ -279,24 +315,24 @@ The key decision is how long a sandbox lives. Does each conversation get a fresh
 | **Assistant-scoped** | [Assistant](/langsmith/assistants) config | Shared across all conversations | A coding assistant that maintains a cloned repo across conversations |
 
 <Note>
-The examples below use an async [graph factory](/langsmith/graph-rebuild) instead of a static graph because the sandbox needs the `thread_id` or `assistant_id` from the runtime config to look up or create the correct sandbox. A graph factory receives the config on each run, so it can resolve the sandbox before building the agent. The factory is async because sandbox creation is an I/O-bound operation that requires runtime information like `thread_id` or `assistant_id` that is only available at invocation time.
+The examples below use an async [graph factory](/langsmith/graph-rebuild) instead of a static graph because the sandbox needs the `thread_id` or `assistant_id` from the runtime to look up or create the correct sandbox. A graph factory receives the runtime on each run, so it can resolve the sandbox before building the agent. The factory is async because sandbox creation is an I/O-bound operation that requires runtime information like `thread_id` or `assistant_id` that is only available at invocation time.
 </Note>
 
 <Tabs>
   <Tab title="Thread-scoped (most common)">
-    Each conversation gets its own sandbox. The [graph factory](/langsmith/graph-rebuild) reads `thread_id` from the config, so each [thread](/langsmith/use-threads) automatically gets its own isolated environment. The provider's label-based lookup handles deduplication across runs. Cleaned up when the sandbox [TTL](/langsmith/configure-ttl) expires.
+    Each conversation gets its own sandbox. The [graph factory](/langsmith/graph-rebuild) reads `thread_id` from the runtime, so each [thread](/langsmith/use-threads) automatically gets its own isolated environment. The provider's label-based lookup handles deduplication across runs. Cleaned up when the sandbox [TTL](/langsmith/configure-ttl) expires.
 
 ```python agent.py
 from daytona import CreateSandboxFromSnapshotParams, Daytona
 from deepagents import create_deep_agent
-from langchain_core.runnables import RunnableConfig
 from langchain_daytona import DaytonaSandbox
+from langgraph.runtime import Runtime
 
 client = Daytona()
 
 
-async def agent(config: RunnableConfig):
-    thread_id = config["configurable"]["thread_id"]
+async def agent(runtime: Runtime):
+    thread_id = runtime.execution_info.thread_id  # [!code highlight]
     try:
         sandbox = await client.find_one(labels={"thread_id": thread_id})
     except Exception:
@@ -314,19 +350,19 @@ async def agent(config: RunnableConfig):
 
   </Tab>
   <Tab title="Assistant-scoped">
-    All conversations share one sandbox. The [graph factory](/langsmith/graph-rebuild) reads the [assistant](/langsmith/assistants) ID from config metadata, so every thread on the same assistant returns to the same environment. Files, installed packages, and cloned repositories persist across conversations.
+    All conversations share one sandbox. The [graph factory](/langsmith/graph-rebuild) reads the [assistant](/langsmith/assistants) ID from `runtime.server_info`, so every thread on the same assistant returns to the same environment. Files, installed packages, and cloned repositories persist across conversations.
 
 ```python agent.py
 from daytona import CreateSandboxFromSnapshotParams, Daytona
 from deepagents import create_deep_agent
-from langchain_core.runnables import RunnableConfig
 from langchain_daytona import DaytonaSandbox
+from langgraph.runtime import Runtime
 
 client = Daytona()
 
 
-async def agent(config: RunnableConfig):
-    assistant_id = config["metadata"]["assistant_id"]
+async def agent(runtime: Runtime):
+    assistant_id = runtime.server_info.assistant_id  # [!code highlight]
     try:
         sandbox = await client.find_one(labels={"assistant_id": assistant_id})
     except Exception:
@@ -462,7 +498,7 @@ class SandboxSyncMiddleware(AgentMiddleware):
 
     async def abefore_agent(self, state: AgentState, runtime: Runtime) -> None:
         """Upload skill scripts and memories into the sandbox."""
-        user_id = runtime.context.user_id
+        user_id = runtime.server_info.user.identity  # [!code highlight]
         store = runtime.store
         files = []
         for item in await store.asearch(("skills", user_id)):
@@ -476,7 +512,7 @@ class SandboxSyncMiddleware(AgentMiddleware):
 
     async def aafter_agent(self, state: AgentState, runtime: Runtime) -> None:
         """Sync updated memories back to the store."""
-        user_id = runtime.context.user_id
+        user_id = runtime.server_info.user.identity  # [!code highlight]
         store = runtime.store
         items = await store.asearch(("memories", user_id))
         results = await self.backend.download_files(
@@ -496,11 +532,11 @@ backend = CompositeBackend(
     routes={
         "/skills/": StoreBackend(
             rt,
-            namespace=lambda ctx: ("skills", ctx.runtime.context.user_id),
+            namespace=lambda ctx: ("skills", ctx.runtime.server_info.user.identity),  # [!code highlight]
         ),
         "/memories/": StoreBackend(
             rt,
-            namespace=lambda ctx: ("memories", ctx.runtime.context.user_id),
+            namespace=lambda ctx: ("memories", ctx.runtime.server_info.user.identity),  # [!code highlight]
         ),
     },
 )

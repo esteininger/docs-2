@@ -7,14 +7,12 @@ Async subagents let a supervisor agent launch background tasks that return immed
 
 This builds on [subagents](/oss/javascript/deepagents/subagents), which run synchronously and block the supervisor until completion. Use async subagents when tasks are long-running, parallelizable, or need mid-flight steering.
 
-<Warning>
+<Note>
 
 
-Async subagents are a preview feature targeted for `deepagents` 1.9.0. You can try them now by installing a prerelease version. Preview features are under active development and are not recommended for production use.
+Async subagents are a preview feature available in `deepagents` 1.9.0. Preview features are under active development and APIs may change.
 
-For JavaScript, install the prerelease version explicitly, for example `deepagents@1.9.0-alpha.0`.
-
-</Warning>
+</Note>
 
 ```mermaid
 graph TB

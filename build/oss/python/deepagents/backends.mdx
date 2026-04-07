@@ -206,32 +206,40 @@ NamespaceFactory = Callable[[BackendContext], tuple[str, ...]]
 
 The `BackendContext` provides:
 - `ctx.runtime.context` — User-supplied context passed via LangGraph's [context schema](https://langchain-ai.github.io/langgraph/concepts/runtime/) (for example, `user_id`)
+- `ctx.runtime.server_info` — Server-specific metadata when running on LangGraph Server (assistant ID, graph ID, authenticated user)
+- `ctx.runtime.execution_info` — Execution identity information (thread ID, run ID, checkpoint ID)
+
+
 - `ctx.state` — Current agent state
 
-For `assistant_id` and `thread_id`, use `langgraph.config.get_config()` inside the factory — these are available in LangGraph config metadata but not on the context schema.
+<Note>
+`ctx.runtime.server_info` and `ctx.runtime.execution_info` require `deepagents>=0.5.0`.
+</Note>
+
+
+
 
 **Common namespace patterns:**
 
 ```python
-from langgraph.config import get_config
 from deepagents.backends import StoreBackend
 
 # Per-user: each user gets their own isolated storage
 backend = StoreBackend(
-    namespace=lambda ctx: (ctx.runtime.context.user_id,),
+    namespace=lambda ctx: (ctx.runtime.server_info.user.identity,),  # [!code highlight]
 )
 
 # Per-assistant: all users of the same assistant share storage
 backend = StoreBackend(
     namespace=lambda ctx: (
-        get_config()["metadata"]["assistant_id"],
+        ctx.runtime.server_info.assistant_id,  # [!code highlight]
     ),
 )
 
 # Per-thread: storage scoped to a single conversation
 backend = StoreBackend(
     namespace=lambda ctx: (
-        get_config()["configurable"]["thread_id"],
+        ctx.runtime.execution_info.thread_id,  # [!code highlight]
     ),
 )
 ```

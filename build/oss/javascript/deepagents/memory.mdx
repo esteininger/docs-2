@@ -29,9 +29,15 @@ The key is the backend namespace: setting it to `(assistant_id,)` means every co
 
 
 
+<Note>
+Accessing `ctx.runtime.serverInfo` requires `deepagents>=1.9.0`. On older versions, read the assistant ID from `getConfig().metadata.assistantId` instead.
+</Note>
+
+
+
+
 ```typescript
 import { createDeepAgent, CompositeBackend, StateBackend, StoreBackend } from "deepagents";
-import { getConfig } from "@langchain/langgraph";
 
 const agent = createDeepAgent({
   memory: ["/memories/AGENTS.md"],
@@ -40,16 +46,10 @@ const agent = createDeepAgent({
     new StateBackend(),
     {
       "/memories/": new StoreBackend({
-        namespace: (ctx) => {
-          const config = getConfig();
-          return [config.metadata.assistantId];
-        },
+        namespace: (ctx) => [ctx.runtime.serverInfo.assistantId],  // [!code highlight]
       }),
       "/skills/": new StoreBackend({
-        namespace: (ctx) => {
-          const config = getConfig();
-          return [config.metadata.assistantId];
-        },
+        namespace: (ctx) => [ctx.runtime.serverInfo.assistantId],  // [!code highlight]
       }),
     },
   ),
@@ -269,15 +269,13 @@ To make past conversations searchable, wrap thread search in a tool. The `user_i
 
 ```typescript
 import { Client } from "@langchain/langgraph-sdk";
-import { getConfig } from "@langchain/langgraph";
 import { tool } from "@langchain/core/tools";
 
 const client = new Client({ apiUrl: "<DEPLOYMENT_URL>" });
 
 const searchPastConversations = tool(
-  async ({ query }: { query: string }) => {
-    const config = getConfig();
-    const userId = config.metadata.userId;
+  async ({ query }, runtime) => {
+    const userId = runtime.serverInfo.user.identity;  // [!code highlight]
     const threads = await client.threads.search({
       metadata: { userId },
       limit: 5,
@@ -394,15 +392,13 @@ The consolidation agent reads recent conversation history and merges key facts i
 ```typescript src/consolidation-agent.ts
 import { createDeepAgent } from "deepagents";
 import { Client } from "@langchain/langgraph-sdk";
-import { getConfig } from "@langchain/langgraph";
 import { tool } from "@langchain/core/tools";
 
 const sdkClient = new Client({ apiUrl: "<DEPLOYMENT_URL>" });
 
 const searchRecentConversations = tool(
-  async ({ query }: { query: string }) => {
-    const config = getConfig();
-    const userId = config.configurable.langgraph_auth_user_id;
+  async ({ query }, runtime) => {
+    const userId = runtime.serverInfo.user.identity;  // [!code highlight]
 
     const since = new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString();
     const threads = await sdkClient.threads.search({
@@ -530,10 +526,10 @@ To give each agent its own memory in a shared deployment, add `assistant_id` to 
 
 ```typescript
 new StoreBackend({
-  namespace: (ctx) => {
-    const config = getConfig();
-    return [config.metadata.assistantId, ctx.runtime.context.userId];
-  },
+  namespace: (ctx) => [
+    ctx.runtime.serverInfo.assistantId,  // [!code highlight]
+    ctx.runtime.context.userId,
+  ],
 })
 ```
 
