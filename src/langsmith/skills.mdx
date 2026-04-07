@@ -29,6 +29,13 @@ npx skills add langchain-ai/langsmith-skills --agent claude-code --skill '*' --y
 ```
 </CodeGroup>
 
+If you use Claude Code, you can also install via the plugin marketplace:
+
+```bash
+/plugin marketplace add langchain-ai/langsmith-skills
+/plugin install langsmith-skills@langsmith-skills
+```
+
 <Tip>
 To update, re‑run the command. If target skill folders already exist, remove them first (e.g., `rm -rf ~/.claude/skills/langsmith-*`).
 </Tip>
@@ -39,19 +46,47 @@ After installing the skills, set environment variables used by all LangSmith ski
 
 ```bash
 export LANGSMITH_API_KEY=<your-key>
+# Required for LangChain/LangGraph auto-tracing
+export LANGSMITH_TRACING=true
 # Optional defaults
 export LANGSMITH_PROJECT=<default-project>
+# Required for LLM-as-judge evaluators
+# export OPENAI_API_KEY=<your-key>
+# export ANTHROPIC_API_KEY=<your-key>
 # Advanced: multi-workspace or certain self-hosted setups only
 # export LANGSMITH_WORKSPACE_ID=<workspace-id>
 ```
 
 ## What these skills cover
 
-- [Traces](/langsmith/observability-concepts#traces): Add tracing to apps; list, filter, inspect, and export traces for debugging and analysis.
-- [Datasets](/langsmith/evaluation-concepts#datasets): Turn traces into evaluation datasets (final_response, single_step, trajectory, RAG) and optionally upload to LangSmith.
-- [Evaluators](/langsmith/evaluation-concepts#evaluators): Define code or LLM‑as‑judge evaluators and attach them to datasets (offline) or projects (online).
+Each skill directory ships with a `SKILL.md` plus optional `scripts/` helpers you can run or adapt. These skills are designed to plug into compatible coding agents (such as Claude Code, Deep Agents CLI, Cursor, Windsurf, and Goose), though you can also reuse the helper scripts directly if you prefer not to wire up a full agent. For heavier querying, exports, or automation, you can pair these skills with the [LangSmith CLI](/langsmith/langsmith-cli) to script against the same projects, datasets, and evaluators from your terminal.
 
-Each skill directory ships with a `SKILL.md` plus optional `scripts/` helpers you can run or adapt. These skills are designed to plug into compatible coding agents (such as Claude Code or DeepAgents CLI), though you can also reuse the helper scripts directly if you prefer not to wire up a full agent. For heavier querying, exports, or automation, you can pair these skills with the [LangSmith CLI](/langsmith/langsmith-cli) to script against the same projects, datasets, and evaluators from your terminal.
+### Traces
+
+Ask your agent to [add tracing](/langsmith/observability-concepts#traces) to your app and query existing traces for debugging and analysis. For LangChain and LangGraph apps, tracing is automatic once `LANGSMITH_TRACING=true` is set. For other frameworks, the agent can instrument your code using the `@traceable` decorator (Python) or `traceable()` wrapper (TypeScript).
+
+Ask your agent to:
+- List and filter recent traces by project, latency, or error status.
+- Inspect a specific trace and its child runs.
+- Export traces to a local file for analysis.
+
+### Datasets
+
+Ask your agent to turn traces into [evaluation datasets](/langsmith/evaluation-concepts#datasets) and upload them to LangSmith. Supports four dataset types: `final_response`, `single_step`, `trajectory`, and `RAG`.
+
+Ask your agent to:
+
+- List existing datasets.
+- Create a new dataset from traces.
+- Add or update individual examples.
+- Export a dataset locally.
+
+### Evaluators
+
+Ask your agent to define [evaluators](/langsmith/evaluation-concepts#evaluators) and attach them to a dataset or project. Use LLM-as-judge for subjective quality checks (accuracy, relevance) or custom code for deterministic checks like exact matching.
+
+- **Offline evaluators** attach to a dataset and run during experiments.
+- **Online evaluators** attach to a project and run on live production traffic.
 
 ## Manual install
 
@@ -80,6 +115,10 @@ cd langsmith-skills
 If you prefer to copy only specific skills, copy the desired directory from `config/skills/` into your agent’s skills folder.
 
 Included LangSmith skills:
-- langsmith-trace — Traces (query/export)
-- langsmith-dataset — Datasets (generate/upload)
-- langsmith-evaluator — Evaluators (create/attach)
+- langsmith-trace: Traces (query/export)
+- langsmith-dataset: Datasets (generate/upload)
+- langsmith-evaluator: Evaluators (create/attach)
+
+<Note>
+Looking for skills to build and improve agents with LangChain, LangGraph, or Deep Agents? Refer to the [langchain-skills](https://github.com/langchain-ai/langchain-skills) repository.
+</Note>
