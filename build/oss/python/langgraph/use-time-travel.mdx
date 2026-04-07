@@ -31,7 +31,7 @@ Use [`get_state_history`](https://reference.langchain.com/python/langgraph/graph
 from langgraph.graph import StateGraph, START
 from langgraph.checkpoint.memory import InMemorySaver
 from typing_extensions import TypedDict, NotRequired
-import uuid
+from langchain_core.utils.uuid import uuid7
 
 class State(TypedDict):
     topic: NotRequired[str]
@@ -57,7 +57,7 @@ graph = (
 )
 
 # Step 1: Run the graph
-config = {"configurable": {"thread_id": str(uuid.uuid4())}}
+config = {"configurable": {"thread_id": str(uuid7())}}
 result = graph.invoke({}, config)
 
 # Step 2: Find a checkpoint to replay from

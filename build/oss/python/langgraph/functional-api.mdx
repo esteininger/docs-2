@@ -79,7 +79,7 @@ def workflow(topic: str) -> dict:
 
   ```python
   import time
-  import uuid
+  from langchain_core.utils.uuid import uuid7
   from langgraph.func import entrypoint, task
   from langgraph.types import interrupt
   from langgraph.checkpoint.memory import InMemorySaver
@@ -112,7 +112,7 @@ def workflow(topic: str) -> dict:
       }
 
 
-  thread_id = str(uuid.uuid4())
+  thread_id = str(uuid7())
   config = {"configurable": {"thread_id": thread_id}}
   for item in workflow.stream("cat", config):
       print(item)

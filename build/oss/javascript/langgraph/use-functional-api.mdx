@@ -37,7 +37,7 @@ await myWorkflow.invoke({ value: 1, anotherValue: 2 });
 
 
   ```typescript
-  import { v4 as uuidv4 } from "uuid";
+  import { v7 as uuid7 } from "uuid";
   import { entrypoint, task, MemorySaver } from "@langchain/langgraph";
 
   // Task that checks if a number is even
@@ -63,7 +63,7 @@ await myWorkflow.invoke({ value: 1, anotherValue: 2 });
   );
 
   // Run the workflow with a unique thread ID
-  const config = { configurable: { thread_id: uuidv4() } };
+  const config = { configurable: { thread_id: uuid7() } };
   const result = await workflow.invoke({ number: 7 }, config);
   console.log(result);
   ```
@@ -78,7 +78,7 @@ await myWorkflow.invoke({ value: 1, anotherValue: 2 });
 
 
   ```typescript
-  import { v4 as uuidv4 } from "uuid";
+  import { v7 as uuid7 } from "uuid";
   import { ChatOpenAI } from "@langchain/openai";
   import { entrypoint, task, MemorySaver } from "@langchain/langgraph";
 
@@ -106,7 +106,7 @@ await myWorkflow.invoke({ value: 1, anotherValue: 2 });
   );
 
   // Execute the workflow
-  const config = { configurable: { thread_id: uuidv4() } };
+  const config = { configurable: { thread_id: uuid7() } };
   const result = await workflow.invoke("the history of flight", config);
   console.log(result);
   ```
@@ -139,7 +139,7 @@ const graph = entrypoint(
 
 
   ```typescript
-  import { v4 as uuidv4 } from "uuid";
+  import { v7 as uuid7 } from "uuid";
   import { ChatOpenAI } from "@langchain/openai";
   import { entrypoint, task, MemorySaver } from "@langchain/langgraph";
 
@@ -168,7 +168,7 @@ const graph = entrypoint(
   );
 
   // Run the workflow
-  const config = { configurable: { thread_id: uuidv4() } };
+  const config = { configurable: { thread_id: uuid7() } };
   const result = await workflow.invoke(["quantum computing", "climate change", "history of aviation"], config);
   console.log(result);
   ```
@@ -211,7 +211,7 @@ const someWorkflow = entrypoint(
 
 
   ```typescript
-  import { v4 as uuidv4 } from "uuid";
+  import { v7 as uuid7 } from "uuid";
   import { entrypoint, MemorySaver, StateGraph, StateSchema } from "@langchain/langgraph";
   import * as z from "zod";
 
@@ -240,7 +240,7 @@ const someWorkflow = entrypoint(
   );
 
   // Execute the workflow
-  const config = { configurable: { thread_id: uuidv4() } };
+  const config = { configurable: { thread_id: uuid7() } };
   console.log(await workflow.invoke(5, config)); // Output: { bar: 10 }
   ```
 
@@ -275,7 +275,7 @@ const myWorkflow = entrypoint(
 
 
   ```typescript
-  import { v4 as uuidv4 } from "uuid";
+  import { v7 as uuid7 } from "uuid";
   import { entrypoint, MemorySaver } from "@langchain/langgraph";
 
   // Initialize a checkpointer
@@ -299,7 +299,7 @@ const myWorkflow = entrypoint(
   );
 
   // Execute the main workflow
-  const config = { configurable: { thread_id: uuidv4() } };
+  const config = { configurable: { thread_id: uuid7() } };
   console.log(await main.invoke({ x: 6, y: 7 }, config)); // Output: { product: 42 }
   ```
 

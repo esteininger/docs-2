@@ -78,11 +78,11 @@ When an interrupt is triggered, the agent pauses execution and returns control. 
 
 
 ```typescript
-import { v4 as uuidv4 } from "uuid";
+import { v7 as uuid7 } from "uuid";
 import { Command } from "@langchain/langgraph";
 
 // Create config with thread_id for state persistence
-const config = { configurable: { thread_id: uuidv4() } };
+const config = { configurable: { thread_id: uuid7() } };
 
 // Invoke the agent
 let result = await agent.invoke({
@@ -133,7 +133,7 @@ When the agent calls multiple tools that require approval, all interrupts are ba
 
 
 ```typescript
-const config = { configurable: { thread_id: uuidv4() } };
+const config = { configurable: { thread_id: uuid7() } };
 
 let result = await agent.invoke({
   messages: [{

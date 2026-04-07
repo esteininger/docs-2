@@ -244,7 +244,7 @@ The agent stage processes text transcripts through a LangChain [agent](/oss/pyth
 ### Implementation
 
 ```python
-from uuid import uuid4
+from langchain_core.utils.uuid import uuid7
 from langchain.agents import create_agent
 from langchain.messages import HumanMessage
 from langgraph.checkpoint.memory import InMemorySaver
@@ -279,7 +279,7 @@ async def agent_stream(
     when processing STT transcripts.
     """
     # Generate unique thread ID for conversation memory
-    thread_id = str(uuid4())
+    thread_id = str(uuid7())
 
     async for event in event_stream:
         # Pass through all upstream events

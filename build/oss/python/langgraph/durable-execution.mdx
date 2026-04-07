@@ -66,7 +66,7 @@ If a [node](/oss/python/langgraph/graph-api#nodes) contains multiple operations,
     ```python
     from typing import NotRequired
     from typing_extensions import TypedDict
-    import uuid
+    from langchain_core.utils.uuid import uuid7
 
     from langgraph.checkpoint.memory import InMemorySaver
     from langgraph.graph import StateGraph, START, END
@@ -99,7 +99,7 @@ If a [node](/oss/python/langgraph/graph-api#nodes) contains multiple operations,
     graph = builder.compile(checkpointer=checkpointer)
 
     # Define a config with a thread ID.
-    thread_id = uuid.uuid4()
+    thread_id = str(uuid7())
     config = {"configurable": {"thread_id": thread_id}}
 
     # Invoke the graph
@@ -110,7 +110,7 @@ If a [node](/oss/python/langgraph/graph-api#nodes) contains multiple operations,
     ```python
     from typing import NotRequired
     from typing_extensions import TypedDict
-    import uuid
+    from langchain_core.utils.uuid import uuid7
 
     from langgraph.checkpoint.memory import InMemorySaver
     from langgraph.func import task
@@ -151,7 +151,7 @@ If a [node](/oss/python/langgraph/graph-api#nodes) contains multiple operations,
     graph = builder.compile(checkpointer=checkpointer)
 
     # Define a config with a thread ID.
-    thread_id = uuid.uuid4()
+    thread_id = str(uuid7())
     config = {"configurable": {"thread_id": thread_id}}
 
     # Invoke the graph

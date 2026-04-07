@@ -76,11 +76,11 @@ interrupt_on = {
 When an interrupt is triggered, the agent pauses execution and returns control. Check for interrupts in the result and handle them accordingly.
 
 ```python
-import uuid
+from langchain_core.utils.uuid import uuid7
 from langgraph.types import Command
 
 # Create config with thread_id for state persistence
-config = {"configurable": {"thread_id": str(uuid.uuid4())}}
+config = {"configurable": {"thread_id": str(uuid7())}}
 
 # Invoke the agent
 result = agent.invoke(
@@ -130,7 +130,7 @@ print(result.value["messages"][-1].content)  # [!code highlight]
 When the agent calls multiple tools that require approval, all interrupts are batched together in a single interrupt. You must provide decisions for each one in order.
 
 ```python
-config = {"configurable": {"thread_id": str(uuid.uuid4())}}
+config = {"configurable": {"thread_id": str(uuid7())}}
 
 result = agent.invoke(
     {"messages": [{

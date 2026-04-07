@@ -30,7 +30,7 @@ Replay re-executes nodes—it doesn't just read from cache. LLM calls, API reque
 Use [`getStateHistory`](https://reference.langchain.com/javascript/classes/_langchain_langgraph.pregel.Pregel.html#getStateHistory) to find the checkpoint you want to replay from, then call [`invoke`](https://reference.langchain.com/javascript/classes/_langchain_langgraph.index.CompiledStateGraph.html#invoke) with that checkpoint's config:
 
 ```typescript
-import { v4 as uuidv4 } from "uuid";
+import { v7 as uuid7 } from "uuid";
 import { StateGraph, MemorySaver, START } from "@langchain/langgraph";
 
 const StateAnnotation = Annotation.Root({
@@ -55,7 +55,7 @@ const graph = new StateGraph(StateAnnotation)
   .compile({ checkpointer });
 
 // Step 1: Run the graph
-const config = { configurable: { thread_id: uuidv4() } };
+const config = { configurable: { thread_id: uuid7() } };
 const result = await graph.invoke({}, config);
 
 // Step 2: Find a checkpoint to replay from
