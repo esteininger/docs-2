@@ -855,7 +855,7 @@ By default, the agent can both read and write memory files. For shared state lik
 **Security considerations:** If one user can write to memory that another user reads, a malicious user could inject instructions into shared state. To mitigate this:
 
 - **Default to user scope** `(user_id)` unless you have a specific reason to share
-- Use **read-only memory** for shared policies (populate via application code, not the agent)
+- Use **read-only memory** for shared policies. Write the content directly to the store from your application code (e.g., an admin script or startup hook using the [Store API](/langsmith/custom-store)) instead of having the agent create or edit it via `edit_file`, and add a [policy hook](/oss/deepagents/backends#add-policy-hooks) on the backend to reject agent writes to those paths.
 - Add **human-in-the-loop** validation before the agent writes to shared memory. Use an [interrupt](/oss/langgraph/capabilities/human-in-the-loop) to require human approval for writes to sensitive paths.
 
 To enforce read-only memory, use [policy hooks](/oss/deepagents/backends#add-policy-hooks) on the backend to reject write operations to specific paths.
