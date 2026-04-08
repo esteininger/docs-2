@@ -701,76 +701,7 @@ Requires `deepagents>=1.9.0` (or `@langchain/langgraph>=1.2.8`).
 </Note>
 :::
 
-## ToolNode
-
-@[`ToolNode`] is a prebuilt node that executes tools in LangGraph workflows. It handles parallel tool execution, error handling, and state injection automatically.
-
-<Info>
-    For custom workflows where you need fine-grained control over tool execution patterns, use @[`ToolNode`] instead of @[`create_agent`]. It's the building block that powers agent tool execution.
-</Info>
-
-### Basic usage
-
-:::python
-
-```python
-from langchain.tools import tool
-from langgraph.prebuilt import ToolNode
-from langgraph.graph import StateGraph, MessagesState, START, END
-
-@tool
-def search(query: str) -> str:
-    """Search for information."""
-    return f"Results for: {query}"
-
-@tool
-def calculator(expression: str) -> str:
-    """Evaluate a math expression."""
-    return str(eval(expression))
-
-# Create the ToolNode with your tools
-tool_node = ToolNode([search, calculator])
-
-# Use in a graph
-builder = StateGraph(MessagesState)
-builder.add_node("tools", tool_node)
-# ... add other nodes and edges
-```
-
-:::
-
-:::js
-
-```typescript
-import { ToolNode } from "@langchain/langgraph/prebuilt";
-import { tool } from "@langchain/core/tools";
-import * as z from "zod";
-
-const search = tool(
-  ({ query }) => `Results for: ${query}`,
-  {
-    name: "search",
-    description: "Search for information.",
-    schema: z.object({ query: z.string() }),
-  }
-);
-
-const calculator = tool(
-  ({ expression }) => String(eval(expression)),
-  {
-    name: "calculator",
-    description: "Evaluate a math expression.",
-    schema: z.object({ expression: z.string() }),
-  }
-);
-
-// Create the ToolNode with your tools
-const toolNode = new ToolNode([search, calculator]);
-```
-
-:::
-
-### Tool return values
+## Tool return values
 
 You can choose different return values for your tools:
 
@@ -778,7 +709,7 @@ You can choose different return values for your tools:
 - Return an `object` for structured results the model should parse.
 - Return a `Command` with optional message when you need to write to state.
 
-#### Return a string
+### Return a string
 
 Return a string when the tool should provide plain text for the model to read and use in its next response.
 
@@ -802,7 +733,7 @@ Behavior:
 
 Use this when the result is naturally human-readable text.
 
-#### Return an object
+### Return an object
 
 Return an object (for example, a `dict`) when your tool produces structured data that the model should inspect.
 
@@ -826,7 +757,7 @@ Behavior:
 
 Use this when downstream reasoning benefits from explicit fields instead of free-form text.
 
-#### Return a Command
+### Return a Command
 
 Return a @[`Command`] when the tool needs to update graph state (for example, setting user preferences or app state).
 You can return a `Command` with or without including a `ToolMessage`.
@@ -851,119 +782,6 @@ Behavior:
 - Use reducers for fields that may be updated by parallel tool calls.
 
 Use this when the tool is not just returning data, but also mutating agent state.
-
-### Error handling
-
-Configure how tool errors are handled. See the @[`ToolNode`] API reference for all options.
-
-:::python
-
-```python
-from langgraph.prebuilt import ToolNode
-
-# Default: catch invocation errors, re-raise execution errors
-tool_node = ToolNode(tools)
-
-# Catch all errors and return error message to LLM
-tool_node = ToolNode(tools, handle_tool_errors=True)
-
-# Custom error message
-tool_node = ToolNode(tools, handle_tool_errors="Something went wrong, please try again.")
-
-# Custom error handler
-def handle_error(e: ValueError) -> str:
-    return f"Invalid input: {e}"
-
-tool_node = ToolNode(tools, handle_tool_errors=handle_error)
-
-# Only catch specific exception types
-tool_node = ToolNode(tools, handle_tool_errors=(ValueError, TypeError))
-```
-
-:::
-
-:::js
-
-```typescript
-import { ToolNode } from "@langchain/langgraph/prebuilt";
-
-// Default behavior
-const toolNode = new ToolNode(tools);
-
-// Catch all errors
-const toolNode = new ToolNode(tools, { handleToolErrors: true });
-
-// Custom error message
-const toolNode = new ToolNode(tools, {
-  handleToolErrors: "Something went wrong, please try again."
-});
-```
-
-:::
-
-### Route with tools_condition
-
-Use @[`tools_condition`] for conditional routing based on whether the LLM made tool calls:
-
-:::python
-
-```python
-from langgraph.prebuilt import ToolNode, tools_condition
-from langgraph.graph import StateGraph, MessagesState, START, END
-
-builder = StateGraph(MessagesState)
-builder.add_node("llm", call_llm)
-builder.add_node("tools", ToolNode(tools))
-
-builder.add_edge(START, "llm")
-builder.add_conditional_edges("llm", tools_condition)  # Routes to "tools" or END
-builder.add_edge("tools", "llm")
-
-graph = builder.compile()
-```
-
-:::
-
-:::js
-
-```typescript
-import { ToolNode, toolsCondition } from "@langchain/langgraph/prebuilt";
-import { StateGraph, MessagesAnnotation } from "@langchain/langgraph";
-
-const builder = new StateGraph(MessagesAnnotation)
-  .addNode("llm", callLlm)
-  .addNode("tools", new ToolNode(tools))
-  .addEdge("__start__", "llm")
-  .addConditionalEdges("llm", toolsCondition)  // Routes to "tools" or "__end__"
-  .addEdge("tools", "llm");
-
-const graph = builder.compile();
-```
-
-:::
-
-### State injection
-
-Tools can access the current graph state through @[`ToolRuntime`]:
-
-:::python
-
-```python
-from langchain.tools import tool, ToolRuntime
-from langgraph.prebuilt import ToolNode
-
-@tool
-def get_message_count(runtime: ToolRuntime) -> str:
-    """Get the number of messages in the conversation."""
-    messages = runtime.state["messages"]
-    return f"There are {len(messages)} messages."
-
-tool_node = ToolNode([get_message_count])
-```
-
-:::
-
-For more details on accessing state, context, and long-term memory from tools, see [Access context](#access-context).
 
 ## Prebuilt tools
 
