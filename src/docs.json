@@ -228,6 +228,7 @@
                         "langsmith/sandboxes",
                         "langsmith/sandbox-templates",
                         "langsmith/sandbox-warm-pools",
+                        "langsmith/sandbox-service-urls",
                         "langsmith/sandbox-auth-proxy",
                         "langsmith/sandbox-sdk"
                       ]
@@ -366,7 +367,8 @@
                       "group": "Data & privacy",
                       "pages": [
                         "langsmith/add-metadata-tags",
-                        "langsmith/mask-inputs-outputs"
+                        "langsmith/mask-inputs-outputs",
+                        "langsmith/otel-gateway-trace-redaction"
                       ]
                     },
                     {
@@ -1025,6 +1027,7 @@
                     {
                       "group": "Deployment",
                       "pages": [
+                        "oss/python/deepagents/deploy",
                         "oss/python/deepagents/going-to-production"
                       ]
                     },
@@ -1130,10 +1133,11 @@
                         {
                           "group": "Integrations",
                           "pages": [
-                            "oss/javascript/langchain/frontend/integrations/overview",
-                            "oss/javascript/langchain/frontend/integrations/ai-elements",
-                            "oss/javascript/langchain/frontend/integrations/assistant-ui",
-                            "oss/javascript/langchain/frontend/integrations/openui"
+                            "oss/python/langchain/frontend/integrations/overview",
+                            "oss/python/langchain/frontend/integrations/copilotkit",
+                            "oss/python/langchain/frontend/integrations/ai-elements",
+                            "oss/python/langchain/frontend/integrations/assistant-ui",
+                            "oss/python/langchain/frontend/integrations/openui"
                           ]
                         }
                       ]
@@ -1344,6 +1348,7 @@
                       "icon": "book",
                       "pages": [
                         "oss/python/concepts/products",
+                        "oss/python/concepts/providers-and-models",
                         "oss/python/langchain/component-architecture",
                         "oss/python/concepts/memory",
                         "oss/python/concepts/context",
@@ -1475,10 +1480,10 @@
                         "oss/javascript/deepagents/human-in-the-loop",
                         "oss/javascript/deepagents/memory",
                         "oss/javascript/deepagents/skills",
-                        "oss/javascript/deepagents/sandboxes"
+                        "oss/javascript/deepagents/sandboxes",
+                        "oss/javascript/deepagents/streaming"
                       ]
                     },
-                    "oss/javascript/deepagents/streaming",
                     {
                       "group": "Frontend",
                       "pages": [
@@ -1500,10 +1505,12 @@
                       ]
                     },
                     {
-                      "group": "Deep Agents CLI",
+                      "group": "Command line interface",
                       "pages": [
                         "oss/javascript/deepagents/cli/overview",
-                        "oss/javascript/deepagents/cli/providers"
+                        "oss/javascript/deepagents/cli/providers",
+                        "oss/javascript/deepagents/cli/configuration",
+                        "oss/javascript/deepagents/cli/mcp-tools"
                       ]
                     }
                   ]
@@ -1534,6 +1541,14 @@
                       ]
                     },
                     {
+                      "group": "Middleware",
+                      "pages": [
+                        "oss/javascript/langchain/middleware/overview",
+                        "oss/javascript/langchain/middleware/built-in",
+                        "oss/javascript/langchain/middleware/custom"
+                      ]
+                    },
+                    {
                       "group": "Frontend",
                       "pages": [
                         "oss/javascript/langchain/frontend/overview",
@@ -1556,19 +1571,12 @@
                           "group": "Integrations",
                           "pages": [
                             "oss/javascript/langchain/frontend/integrations/overview",
+                            "oss/javascript/langchain/frontend/integrations/copilotkit",
                             "oss/javascript/langchain/frontend/integrations/ai-elements",
                             "oss/javascript/langchain/frontend/integrations/assistant-ui",
                             "oss/javascript/langchain/frontend/integrations/openui"
                           ]
                         }
-                      ]
-                    },
-                    {
-                      "group": "Middleware",
-                      "pages": [
-                        "oss/javascript/langchain/middleware/overview",
-                        "oss/javascript/langchain/middleware/built-in",
-                        "oss/javascript/langchain/middleware/custom"
                       ]
                     },
                     {
@@ -1819,6 +1827,7 @@
                       "icon": "book",
                       "pages": [
                         "oss/javascript/concepts/products",
+                        "oss/javascript/concepts/providers-and-models",
                         "oss/javascript/langchain/component-architecture",
                         "oss/javascript/concepts/memory",
                         "oss/javascript/concepts/context",
@@ -1935,16 +1944,20 @@
   },
   "redirects": [
     {
+      "source": "/oss/deepagents/memory",
+      "destination": "/oss/python/deepagents/memory"
+    },
+    {
       "source": "/oss/deepagents/long-term-memory",
-      "destination": "/oss/deepagents/memory"
+      "destination": "/oss/python/deepagents/memory"
     },
     {
       "source": "/oss/python/deepagents/long-term-memory",
-      "destination": "/oss/deepagents/memory"
+      "destination": "/oss/python/deepagents/memory"
     },
     {
       "source": "/oss/javascript/deepagents/long-term-memory",
-      "destination": "/oss/deepagents/memory"
+      "destination": "/oss/javascript/deepagents/memory"
     },
     {
       "source": "/docs",
@@ -1972,10 +1985,6 @@
     },
     {
       "source": "/langsmith/langsmith-fetch",
-      "destination": "/langsmith/langsmith-cli"
-    },
-    {
-      "source": "/langsmith/langsmith-mcp-server",
       "destination": "/langsmith/langsmith-cli"
     },
     {
