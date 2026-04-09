@@ -8,7 +8,7 @@ Tools allow language models to interact with external systems and perform action
 1. [**Built-in tools**](#built-in-tools): Pre-configured tools provided by model providers (like OpenAI and Anthropic) that are ready to use. Use built-in tools when you need common capabilities like web search or code interpretation.
 2. [**Custom tools**](#create-a-custom-tool): Functions you define to perform specific tasks. These are useful when you need to integrate with your own systems or create specialized functionality. When you define custom tools within the Playground, you can verify that the model correctly identifies and calls these tools with the correct arguments.
 
-When you create a custom tool, it is saved to the current prompt only. You can save it to a workspace-wide [tool registry](#manage-tools-with-the-registry) to reuse it across prompts and sessions.
+When you create a custom tool, you can save it to the current prompt only, or save it directly to the workspace-wide [tool registry](#manage-tools-with-the-registry). Saving to the registry also adds the tool to the current prompt.
 
 ## Built-in tools
 
@@ -69,7 +69,7 @@ When running a custom tool in the Playground, the model will respond with a JSON
 
 ### Manage tools with the registry
 
-The Playground includes a [workspace](/langsmith/administration-overview#workspaces)-scoped **tool registry** for saving and reusing tools across prompts and sessions. When you create a custom tool, it is saved to the current prompt only. To make it available across all prompts in your workspace, save it to the registry.
+The Playground includes a [workspace](/langsmith/administration-overview#workspaces)-scoped **tool registry** for saving and reusing tools across prompts and sessions. When you create a custom tool, you can save it to the current prompt only, or save it directly to the registry. Saving to the registry also adds the tool to the current prompt.
 
 Click the **+ Tool** button in the Playground to open **Manage tools**. From the **Available Tools** tab, you can:
 
