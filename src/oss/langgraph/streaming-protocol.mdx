@@ -115,7 +115,7 @@ event: values
 data: {"messages": [...], "summary": "...", "tools_used": []}
 ```
 
-**Data shape** — your graph's state type.
+The shape of the streamed event is:
 
 Use `values` to track what state the graph is in after each step, and to render final outputs. Avoid using `values` to stream tokens character by character; use `messages-tuple` for that.
 
