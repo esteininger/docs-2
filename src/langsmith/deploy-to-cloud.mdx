@@ -269,9 +269,3 @@ This NAT gateway will have several static IP addresses depending on the region y
 | 34.135.61.140  |                 |                                       |
 | 34.121.166.52  |                 |                                       |
 | 34.31.121.70   |                 |                                       |
-
-<Note>
-**US (AWS):** Organizations on [https://aws.smith.langchain.com](https://aws.smith.langchain.com) use LangGraph Cloud deployments in a dedicated AWS dataplane VPC in `us-east-2`. The addresses in this column are the **LangGraph dataplane** NAT gateway public IPs (one per AZ). They are not the same as the LangSmith control-plane NAT pool in [Cloud allowlisting](/langsmith/cloud#allowlisting-ip-addresses). Your LangChain account team can provide updates, or they are emitted as `lsd_prod_useast2_nat_gateway_public_ips` from internal deployment tooling.
-
-If you need **ingress** allowlists for traffic **to** deployment URLs under `*.aws.us.langgraph.app`, use the stable NLB Elastic IPs from `lsd_prod_useast2_envoy_gateway_nlb_public_ips` (same tooling). See also [Cloud allowlisting](/langsmith/cloud#allowlisting-ip-addresses) for LangSmith control-plane NAT and API NLB addresses.
-</Note>

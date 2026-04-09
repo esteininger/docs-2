@@ -46,7 +46,11 @@ The US-based LangSmith service (default GCP region) is deployed in the `us-centr
 The [EU-based LangSmith service](https://eu.smith.langchain.com) is now available (as of mid-July 2024) and is deployed in the `europe-west4` (Netherlands) region of GCP. If you are interested in an enterprise plan in this region, [contact our sales team](https://www.langchain.com/contact-sales).
 </Note>
 
-The [AWS-hosted LangSmith service](https://aws.smith.langchain.com) runs in AWS `us-east-2` (Ohio). The LangSmith control plane (UI, APIs, and related services) runs on Amazon EKS. [LangSmith Cloud deployments](/langsmith/deployment) for that environment are provisioned in a separate LangGraph dataplane cluster in the same AWS region; deployment hostnames use the `*.aws.us.langgraph.app` domain (see the [Regions FAQ](/langsmith/regions-faq)).
+The [AWS-hosted LangSmith service](https://aws.smith.langchain.com) runs on Amazon EKS in AWS `us-east-2` (Ohio).
+
+<Note>
+As of April 2026, LangSmith SaaS is available on AWS in `us-east-2` (Ohio). [LangSmith Cloud deployments](/langsmith/deployment) for that environment use a LangGraph dataplane cluster in the same region; deployment hostnames use `*.aws.us.langgraph.app` (see the [Regions FAQ](/langsmith/regions-faq)).
+</Note>
 
 #### Regional storage
 
@@ -71,7 +75,7 @@ Data listed here is stored exclusively in the US:
 
 #### GCP services
 
-The following applies to the **US and EU** SaaS regions on GCP. The **AWS** SaaS region uses the same logical components on **Amazon EKS** (and related AWS networking and data services) instead of GKE.
+The following applies to the **US and EU** SaaS regions on GCP.
 
 LangSmith is composed of the following services, all deployed on Google Kubernetes Engine (GKE):
 
@@ -93,6 +97,31 @@ Some additional GCP services we use include:
 * Google Cloud Load Balancer for routing traffic to the LangSmith services.
 * Google Cloud CDN for caching static assets.
 * Google Cloud Armor for security and rate limits. For more information on rate limits we enforce, please refer to [Rate limits](/langsmith/administration-overview#rate-limits).
+
+#### AWS services
+
+The following applies to the **US (AWS)** SaaS region in `us-east-2` (Ohio). The same logical LangSmith components run on **Amazon EKS** instead of GKE.
+
+LangSmith is composed of the following services, all deployed on Amazon EKS:
+
+* LangSmith Frontend: serves the LangSmith UI.
+* LangSmith Backend: serves the LangSmith API.
+* LangSmith Platform Backend: handles authentication and other high-volume tasks. (Internal service)
+* LangSmith Playground: handles forwarding requests to various LLM providers for the Playground feature.
+* LangSmith Queue: handles processing of asynchronous tasks. (Internal service)
+
+LangSmith uses the following AWS storage and data services:
+
+* Amazon S3 for runs inputs and outputs.
+* Amazon RDS for PostgreSQL for transactional workloads.
+* Amazon ElastiCache for Redis for queuing and caching.
+* ClickHouse Cloud over AWS PrivateLink in `us-east-2` for trace ingestion and analytics, consistent with the [regional storage](#regional-storage) table above.
+
+Some additional AWS services we use include:
+
+* Elastic Load Balancing (Network Load Balancers) and Istio ingress for routing traffic to the LangSmith services. Documented API rate limits are enforced at the Istio ingress gateway. For details, see [Rate limits](/langsmith/administration-overview#rate-limits).
+* Amazon CloudFront for caching static assets (including the web UI hostname `aws.smith.langchain.com`).
+* AWS WAF on CloudFront for managed rule groups at the edge (for example, AWS Managed Rules common protections and Bot Control).
 
 <div style={{ textAlign: 'center' }}>
 <img
@@ -124,13 +153,7 @@ All traffic leaving LangSmith services will be routed through a NAT gateway. All
 | 34.59.97.173   | 35.204.101.241 |                                |
 | 104.198.162.55 | 35.204.48.32   |                                |
 
-<Note>
-**US (AWS):** These are the public IPs of the LangSmith **control-plane** NAT gateways in `us-east-2` (one per availability zone in use). They differ from the LangGraph dataplane NAT pool in [Allowlist IP addresses](/langsmith/deploy-to-cloud#allowlist-ip-addresses). Your LangChain account team can provide updates, or they are emitted as `langsmith_prod_nat_gateway_public_ips` from internal deployment tooling.
-</Note>
-
 It may be helpful to allowlist these IP addresses if connecting to your own AzureOpenAI service or other endpoints that may be required by the Playground or Online Evaluation.
-
-For **egress from LangGraph Cloud deployments** on US (AWS) (traffic leaving the LangGraph dataplane VPC in `us-east-2` toward your endpoints), use the separate NAT allowlist in [Allowlist IP addresses](/langsmith/deploy-to-cloud#allowlist-ip-addresses) (**US (AWS)** column).
 
 #### Ingress into LangChain SaaS
 The LangChain endpoints map to the following static IP addresses for traffic that terminates on our **GCP load balancers** (US/EU) or, for **US (AWS)**, on the **Network Load Balancer** in `us-east-2` (API and gateway hostnames):
@@ -144,14 +167,6 @@ The LangChain endpoints map to the following static IP addresses for traffic tha
 |                |                | 3.134.146.243                      |
 |                |                | 3.150.87.246                       |
 
-<Note>
-**US (AWS):** Traffic to `aws.api.smith.langchain.com` and related API / gateway hostnames (`aws.api.hub.langchain.com`, `aws.api.host.langchain.com`, etc.) terminates on **two** internet-facing Istio ingress Network Load Balancers in `us-east-2` (primary and weighted routing). Allowlist **all** Elastic IPs above. Your LangChain account team can provide updates, or they are split across `langsmith_prod_istio_gateway_nlb_normal_public_ips` and `langsmith_prod_istio_gateway_nlb_weighted_public_ips` from internal deployment tooling (three EIPs per NLB, one per AZ).
-</Note>
-
-<Note>
-The web UI hostname **`aws.smith.langchain.com`** is fronted by **Amazon CloudFront**. CloudFront uses a global anycast edge network, so **static destination IP allowlisting is not practical** for that hostname. If you must allowlist fixed IPs, use the **API and gateway hostnames** that terminate on the NLB (and the US (AWS) column above), not the CloudFront URL.
-</Note>
-
 You may need to allowlist these to enable traffic from your private network to LangSmith SaaS endpoints (`api.smith.langchain.com`, `smith.langchain.com`, `beacon.langchain.com`, `eu.api.smith.langchain.com`, `eu.smith.langchain.com`, `eu.beacon.langchain.com`, `aws.api.smith.langchain.com`, `aws.smith.langchain.com`, and related `aws.*` API hosts as applicable).
 
 ### Private Service Connect (Enterprise)
@@ -161,10 +176,6 @@ You may need to allowlist these to enable traffic from your private network to L
 </Callout>
 
 Enterprise customers on **GCP** can connect to LangSmith via [Private Service Connect (PSC)](https://cloud.google.com/vpc/docs/private-service-connect), providing private connectivity without exposing traffic to the public internet.
-
-<Note>
-Private Service Connect is **not** available for the AWS-hosted LangSmith region. Enterprise customers on AWS typically use **static NLB Elastic IPs** (see [Ingress into LangChain SaaS](#ingress-into-langchain-saas)) and TLS to the documented API hostnames.
-</Note>
 
 #### Service attachment URIs
 
