@@ -46,10 +46,8 @@ The US-based LangSmith service (default GCP region) is deployed in the `us-centr
 The [EU-based LangSmith service](https://eu.smith.langchain.com) is now available (as of mid-July 2024) and is deployed in the `europe-west4` (Netherlands) region of GCP. If you are interested in an enterprise plan in this region, [contact our sales team](https://www.langchain.com/contact-sales).
 </Note>
 
-The [AWS-hosted LangSmith service](https://aws.smith.langchain.com) runs on Amazon EKS in AWS `us-east-2` (Ohio).
-
 <Note>
-As of April 2026, LangSmith SaaS is available on AWS in `us-east-2` (Ohio). [LangSmith Cloud deployments](/langsmith/deployment) for that environment use a LangGraph dataplane cluster in the same region; deployment hostnames use `*.aws.us.langgraph.app` (see the [Regions FAQ](/langsmith/regions-faq)).
+As of April 2026, LangSmith SaaS is available on AWS in `us-east-2` (Ohio).
 </Note>
 
 #### Regional storage
@@ -61,8 +59,8 @@ The resources and services in this table are stored in the location correspondin
 | URL                                 | [https://smith.langchain.com](https://smith.langchain.com)         | [https://eu.smith.langchain.com](https://eu.smith.langchain.com)         | [https://aws.smith.langchain.com](https://aws.smith.langchain.com)       |
 | API URL                             | [https://api.smith.langchain.com](https://api.smith.langchain.com) | [https://eu.api.smith.langchain.com](https://eu.api.smith.langchain.com) | [https://aws.api.smith.langchain.com](https://aws.api.smith.langchain.com) |
 | Cloud                               | GCP us-central1 (Iowa)                                             | GCP europe-west4 (Netherlands)                                           | AWS us-east-2 (Ohio)                                                   |
-| Supabase                            | AWS us-east-1 (N. Virginia)                                        | AWS eu-central-1 (Germany)                                               | Hosted auth at `aws.auth.langchain.com` (Supabase-backed)                |
-| ClickHouse Cloud                    | us-central1 (Iowa)                                                 | europe-west4 (Netherlands)                                               | ClickHouse Cloud over AWS PrivateLink in `us-east-2`                     |
+| Supabase                            | AWS us-east-1 (N. Virginia)                                        | AWS eu-central-1 (Germany)                                               | AWS us-east-2 (Ohio)                                                   |
+| ClickHouse Cloud                    | us-central1 (Iowa)                                                 | europe-west4 (Netherlands)                                               | us-east-2 (Ohio)                                                       |
 | [LangSmith deployment](/langsmith/deployment) | GCP us-central1 (Iowa); `*.us.langgraph.app`                       | GCP europe-west4 (Netherlands); `*.eu.langgraph.app`                     | AWS us-east-2 (Ohio); `*.aws.us.langgraph.app`                           |
 
 See the [Regions FAQ](/langsmith/regions-faq) for more information.
