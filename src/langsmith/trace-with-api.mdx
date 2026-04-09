@@ -4,7 +4,7 @@ sidebarTitle: Trace with API
 description: Learn how to trace LLM applications using the LangSmith REST API directly.
 ---
 
-This guide covers two approaches to tracing with the REST API: basic tracing using the `POST /runs` and `PATCH /runs` endpoints, and batch ingestion using `POST /runs/multipart` for higher throughput. For a full list of endpoints and request/response schemas, refer to the API reference for your region ([US (GCP)](https://api.smith.langchain.com/redoc), [EU (GCP)](https://eu.api.smith.langchain.com/redoc), [US (AWS)](https://aws.api.smith.langchain.com/redoc)).
+This guide covers two approaches to tracing with the REST API: basic tracing using the `POST /runs` and `PATCH /runs` endpoints, and batch ingestion using `POST /runs/multipart` for higher throughput. For a full list of endpoints and request/response schemas, refer to the [API reference](https://api.smith.langchain.com/redoc).
 
 <Warning>
 We strongly recommend using the Python or TypeScript SDK to send traces to LangSmith instead of the REST API directly. The SDKs include batching and background sending optimizations that prevent tracing from affecting your application's performance.

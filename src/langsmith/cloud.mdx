@@ -165,7 +165,7 @@ The LangChain endpoints map to the following static IP addresses for traffic tha
 |                |                | 3.134.146.243                      |
 |                |                | 3.150.87.246                       |
 
-You may need to allowlist these to enable traffic from your private network to LangSmith SaaS endpoints (`api.smith.langchain.com`, `smith.langchain.com`, `beacon.langchain.com`, `eu.api.smith.langchain.com`, `eu.smith.langchain.com`, `eu.beacon.langchain.com`, `aws.api.smith.langchain.com`, `aws.smith.langchain.com`, and related `aws.*` API hosts as applicable).
+You may need to allowlist these to enable traffic from your private network to LangSmith SaaS endpoints (`api.smith.langchain.com`, `smith.langchain.com`, `beacon.langchain.com`, `eu.api.smith.langchain.com`, `eu.smith.langchain.com`, `eu.beacon.langchain.com`, `aws.api.smith.langchain.com`, `aws.smith.langchain.com`).
 
 ### Private Service Connect (Enterprise)
 
@@ -343,7 +343,5 @@ LangSmith enforces rate limits on API endpoints to ensure service stability and 
 - **Public download**: High-volume public download endpoints for shared resources.
 - **Stats**: Run statistics and analytics endpoints (region-specific limits apply).
 - **Public (catch-all)**: Default rate limit for unauthenticated public access.
-
-The AWS-hosted LangSmith API (`aws.api.smith.langchain.com` and related hosts) uses the **same rate limits as US prod** in the table above unless your contract states otherwise.
 
 For more information on rate limits and other service limits, refer to the [Administration overview](/langsmith/administration-overview#rate-limits).
