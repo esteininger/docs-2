@@ -50,9 +50,9 @@ The [AWS-hosted LangSmith service](https://aws.smith.langchain.com) runs in AWS 
 
 #### Regional storage
 
-The resources and services in this table are stored in the location corresponding to the URL where sign-up occurred (US GCP, EU GCP, or AWS US). Cloud-managed LangSmith uses [Supabase](https://supabase.com) for authentication/authorization and [ClickHouse Cloud](https://clickhouse.com/cloud) for the data warehouse.
+The resources and services in this table are stored in the location corresponding to the URL where sign-up occurred (US (GCP), EU (GCP), or US (AWS)). Cloud-managed LangSmith uses [Supabase](https://supabase.com) for authentication/authorization and [ClickHouse Cloud](https://clickhouse.com/cloud) for the data warehouse.
 
-|                                     | US (GCP)                                                           | EU (GCP)                                                                 | AWS (US)                                                                 |
+|                                     | US (GCP)                                                           | EU (GCP)                                                                 | US (AWS)                                                                 |
 | ----------------------------------- | ------------------------------------------------------------------ | ------------------------------------------------------------------------ | ------------------------------------------------------------------------ |
 | URL                                 | [https://smith.langchain.com](https://smith.langchain.com)         | [https://eu.smith.langchain.com](https://eu.smith.langchain.com)         | [https://aws.smith.langchain.com](https://aws.smith.langchain.com)       |
 | API URL                             | [https://api.smith.langchain.com](https://api.smith.langchain.com) | [https://eu.api.smith.langchain.com](https://eu.api.smith.langchain.com) | [https://aws.api.smith.langchain.com](https://aws.api.smith.langchain.com) |
@@ -113,11 +113,11 @@ Some additional GCP services we use include:
 #### Egress from LangChain SaaS
 All traffic leaving LangSmith services will be routed through a NAT gateway. All traffic will appear to originate from the following IP addresses:
 
-| US (GCP)       | EU (GCP)       | AWS (control plane, us-east-2) |
+| US (GCP)       | EU (GCP)       | US (AWS)                       |
 | -------------- | -------------- | ------------------------------ |
-| 34.59.65.97    | 34.13.192.67   | _Fill: NAT gateway IP 1_       |
-| 34.67.51.221   | 34.147.105.64  | _Fill: NAT gateway IP 2_       |
-| 34.46.212.37   | 34.90.22.166   | _Fill: NAT gateway IP 3_       |
+| 34.59.65.97    | 34.13.192.67   | 18.188.147.158                 |
+| 34.67.51.221   | 34.147.105.64  | 18.219.86.202                  |
+| 34.46.212.37   | 34.90.22.166   | 3.21.57.192                    |
 | 34.132.150.88  | 34.147.36.213  |                                |
 | 35.188.222.201 | 34.32.137.113  |                                |
 | 34.58.194.127  | 34.91.238.184  |                                |
@@ -125,28 +125,31 @@ All traffic leaving LangSmith services will be routed through a NAT gateway. All
 | 104.198.162.55 | 35.204.48.32   |                                |
 
 <Note>
-**AWS column:** Replace the placeholders with the public IPs of the LangSmith control-plane NAT gateways in `us-east-2` (one per availability zone in use). Your LangChain account team can provide the current list, or they are emitted as `langsmith_prod_nat_gateway_public_ips` from internal deployment tooling.
+**US (AWS):** These are the public IPs of the LangSmith **control-plane** NAT gateways in `us-east-2` (one per availability zone in use). They differ from the LangGraph dataplane NAT pool in [Allowlist IP addresses](/langsmith/deploy-to-cloud#allowlist-ip-addresses). Your LangChain account team can provide updates, or they are emitted as `langsmith_prod_nat_gateway_public_ips` from internal deployment tooling.
 </Note>
 
 It may be helpful to allowlist these IP addresses if connecting to your own AzureOpenAI service or other endpoints that may be required by the Playground or Online Evaluation.
 
-For **egress from LangGraph Cloud deployments** on AWS (traffic leaving the LangGraph dataplane VPC toward your endpoints), use the separate NAT allowlist in [Allowlist IP addresses](/langsmith/deploy-to-cloud#allowlist-ip-addresses) (AWS / `us-east-2` column).
+For **egress from LangGraph Cloud deployments** on US (AWS) (traffic leaving the LangGraph dataplane VPC in `us-east-2` toward your endpoints), use the separate NAT allowlist in [Allowlist IP addresses](/langsmith/deploy-to-cloud#allowlist-ip-addresses) (**US (AWS)** column).
 
 #### Ingress into LangChain SaaS
-The LangChain endpoints map to the following static IP addresses for traffic that terminates on our **GCP load balancers** (US/EU) or on the **AWS Network Load Balancer** (API and gateway hostnames for the AWS region):
+The LangChain endpoints map to the following static IP addresses for traffic that terminates on our **GCP load balancers** (US/EU) or, for **US (AWS)**, on the **Network Load Balancer** in `us-east-2` (API and gateway hostnames):
 
-| US (GCP)       | EU (GCP)       | AWS (API / gateway NLB, us-east-2) |
+| US (GCP)       | EU (GCP)       | US (AWS)                           |
 | -------------- | -------------- | ---------------------------------- |
-| 34.8.121.39    | 34.95.92.214   | _Fill: NLB Elastic IP 1_           |
-| 34.107.251.234 | 34.13.73.122   | _Fill: NLB Elastic IP 2_           |
-|                |                | _Fill: NLB Elastic IP 3_           |
+| 34.8.121.39    | 34.95.92.214   | 3.129.27.169                       |
+| 34.107.251.234 | 34.13.73.122   | 13.58.107.119                      |
+|                |                | 16.59.151.49                       |
+|                |                | 16.59.98.147                       |
+|                |                | 3.134.146.243                      |
+|                |                | 3.150.87.246                       |
 
 <Note>
-**AWS column:** Replace the placeholders with the stable Elastic IPs attached to the internet-facing Envoy Gateway NLB for `aws.api.smith.langchain.com` and related API hosts (`aws.api.hub.langchain.com`, `aws.api.host.langchain.com`, etc.). Your LangChain account team can provide the current list, or they are emitted as `langsmith_prod_envoy_gateway_nlb_public_ips` from internal deployment tooling.
+**US (AWS):** Traffic to `aws.api.smith.langchain.com` and related API / gateway hostnames (`aws.api.hub.langchain.com`, `aws.api.host.langchain.com`, etc.) terminates on **two** internet-facing Istio ingress Network Load Balancers in `us-east-2` (primary and weighted routing). Allowlist **all** Elastic IPs above. Your LangChain account team can provide updates, or they are split across `langsmith_prod_istio_gateway_nlb_normal_public_ips` and `langsmith_prod_istio_gateway_nlb_weighted_public_ips` from internal deployment tooling (three EIPs per NLB, one per AZ).
 </Note>
 
 <Note>
-The web UI hostname **`aws.smith.langchain.com`** is fronted by **Amazon CloudFront**. CloudFront uses a global anycast edge network, so **static destination IP allowlisting is not practical** for that hostname. If you must allowlist fixed IPs, use the **API and gateway hostnames** that terminate on the NLB (and the AWS column above), not the CloudFront URL.
+The web UI hostname **`aws.smith.langchain.com`** is fronted by **Amazon CloudFront**. CloudFront uses a global anycast edge network, so **static destination IP allowlisting is not practical** for that hostname. If you must allowlist fixed IPs, use the **API and gateway hostnames** that terminate on the NLB (and the US (AWS) column above), not the CloudFront URL.
 </Note>
 
 You may need to allowlist these to enable traffic from your private network to LangSmith SaaS endpoints (`api.smith.langchain.com`, `smith.langchain.com`, `beacon.langchain.com`, `eu.api.smith.langchain.com`, `eu.smith.langchain.com`, `eu.beacon.langchain.com`, `aws.api.smith.langchain.com`, `aws.smith.langchain.com`, and related `aws.*` API hosts as applicable).
