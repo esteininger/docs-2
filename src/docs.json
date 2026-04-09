@@ -1027,6 +1027,7 @@
                     {
                       "group": "Deployment",
                       "pages": [
+                        "oss/python/deepagents/deploy",
                         "oss/python/deepagents/going-to-production"
                       ]
                     },
