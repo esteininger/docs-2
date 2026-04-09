@@ -45,9 +45,11 @@ const response = await model.invoke("Why do parrots talk?");
 See [`initChatModel`](https://reference.langchain.com/javascript/langchain/chat_models/universal/initChatModel) for more detail, including information on how to pass model [parameters](#parameters).
 
 
-### Supported models
+### Supported providers and models
 
-LangChain supports all major model providers, including OpenAI, Anthropic, Google, Azure, AWS Bedrock, and more. Each provider offers a variety of models with different capabilities. For a full list of supported models in LangChain, see the [integrations page](/oss/javascript/integrations/providers/overview).
+LangChain supports all major model providers through dedicated integration packages. Each provider package implements the same standard interface, so you can swap providers without rewriting application logic. New model names work immediately — no LangChain update required — because provider packages pass model names directly to the provider's API.
+
+Browse the [full list of supported providers](/oss/javascript/integrations/providers/overview), or see [Providers and models](/oss/javascript/concepts/providers-and-models) for a conceptual overview of how providers, packages, and model names work together in LangChain.
 
 ### Key methods
 
