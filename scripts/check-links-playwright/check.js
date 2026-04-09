@@ -15,12 +15,15 @@
  * Example:
  *   node check.js https://docs.langchain.com/
  *   node check.js --max-pages=100
+ *
+ * Output: report (summary, broken links) goes to stdout; crawl/verify progress uses stderr.
+ *   node check.js > report.txt   # captures the full report; progress still prints to terminal
  */
 
 import { chromium } from 'playwright';
 
 const BASE_URL = 'https://docs.langchain.com';
-const DEFAULT_MAX_PAGES = 500;
+const DEFAULT_MAX_PAGES = 50000;
 const DEFAULT_TIMEOUT = 15000;
 const DEFAULT_CONCURRENCY = 8;
 
@@ -157,7 +160,7 @@ async function main() {
           }
         }
       } catch (err) {
-        console.error(`\nFailed to load ${url}: ${err.message}`);
+        console.log(`\nFailed to load ${url}: ${err.message}`);
       } finally {
         await page.close();
       }
@@ -204,10 +207,10 @@ async function main() {
       results.push(...batchResults);
       for (const r of batchResults) {
         if (!r.ok) {
-          broken.push({ url: r.url, error: r.error, status: r.status });
           const { sourcePage } = linksToCheck.get(r.url) || {};
-          console.error(`❌ ${r.url}`);
-          console.error(`   ${r.error}${sourcePage ? ` (from ${sourcePage})` : ''}`);
+          broken.push({ url: r.url, error: r.error, status: r.status, sourcePage });
+          console.log(`❌ ${r.url}`);
+          console.log(`   ${r.error}${sourcePage ? ` (from ${sourcePage})` : ''}`);
         }
       }
       process.stderr.write(`\rVerified ${Math.min(i + concurrency, urls.length)}/${urls.length} links (${broken.length} broken)...`);
@@ -222,6 +225,13 @@ async function main() {
   console.log(`\n${total} links checked: ${okCount} OK, ${broken.length} broken`);
 
   if (broken.length > 0) {
+    // stdout so `node check.js > report.txt` captures the full report (stderr is progress only)
+    console.log('\n--- Broken links (URL → source page) ---');
+    for (const b of broken) {
+      console.log(b.url);
+      console.log(`  source: ${b.sourcePage ?? '(unknown)'}`);
+      console.log(`  ${b.error}${b.status != null ? ` (${b.status})` : ''}`);
+    }
     process.exit(1);
   }
 }
