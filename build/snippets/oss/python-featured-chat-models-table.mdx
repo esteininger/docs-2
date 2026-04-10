@@ -1,0 +1,38 @@
+<Info>
+    **While these LangChain classes support the indicated advanced feature**, you may need to refer to provider-specific documentation to learn which hosted models or backends support the feature.
+</Info>
+
+| Model | [Tool calling](../langchain/tools) | [Structured output](../langchain/structured-output/) | [Multimodal](../langchain/messages#multimodal) |
+|-|-|-|-|
+| [`ChatOpenAI`](../integrations/chat/openai) | ✅ | ✅ | ✅ |
+| [`ChatAnthropic`](../integrations/chat/anthropic) | ✅ | ✅ | ✅ |
+| [`ChatVertexAI`](../integrations/chat/google_vertex_ai) (deprecated) | ✅ | ✅ | ✅ |
+| [`ChatGoogleGenerativeAI`](../integrations/chat/google_generative_ai) | ✅ | ✅ | ✅ |
+| [`AzureChatOpenAI`](../integrations/chat/azure_chat_openai) | ✅ | ✅ | ✅ |
+| [`ChatGroq`](../integrations/chat/groq) | ✅ | ✅ | ❌ |
+| [`ChatBedrock`](../integrations/chat/bedrock) | ✅ | ✅ | ❌ |
+| [`ChatAmazonNova`](../integrations/chat/amazon_nova) | ✅ | ❌ | ✅ |
+| [`ChatHuggingFace`](../integrations/chat/huggingface) | ✅ | ✅ | ❌ |
+| [`ChatOllama`](../integrations/chat/ollama) | ✅ | ✅ | ❌ |
+| [`ChatWatsonx`](../integrations/chat/ibm_watsonx) | ✅ | ✅ | ✅ |
+| [`ChatXAI`](../integrations/chat/xai) | ✅ | ✅ | ❌ |
+| [`ChatNVIDIA`](../integrations/chat/nvidia_ai_endpoints) | ✅ | ✅ | ✅ |
+| [`ChatCohere`](../integrations/chat/cohere) | ✅ | ✅ | ❌ |
+| [`ChatMistralAI`](../integrations/chat/mistralai) | ✅ | ✅ | ❌ |
+| [`ChatTogether`](../integrations/chat/together) | ✅ | ✅ | ❌ |
+| [`ChatFireworks`](../integrations/chat/fireworks) | ✅ | ✅ | ❌ |
+| [`ChatLlamaCpp`](../integrations/chat/llamacpp) | ✅ | ✅ | ❌ |
+| [`ChatDeepSeek`](../integrations/chat/deepseek) | ✅ | ✅ | ❌ |
+| [`ChatDatabricks`](../integrations/chat/databricks) | ✅ | ✅ | ❌ |
+| [`ChatPerplexity`](../integrations/chat/perplexity) | ❌ | ✅ | ✅ |
+| [`ChatOpenRouter`](../integrations/chat/openrouter) | ✅ | ✅ | ✅ |
+| [`ChatLiteLLM`](../integrations/chat/litellm) | ✅ | ✅ | ✅ |
+
+### Routers & proxies
+
+Routers and proxies give you access to models from multiple providers through a single API and credential. They can simplify billing, let you switch between models without changing integrations, and offer features like automatic fallbacks.
+
+| Provider | Integration | Description |
+|-|-|-|
+| [OpenRouter](https://openrouter.ai/) | [`ChatOpenRouter`](../integrations/chat/openrouter) | Unified access to models from OpenAI, Anthropic, Google, Meta, and more |
+| [LiteLLM](https://www.litellm.ai/) | [`ChatLiteLLM`](../integrations/chat/litellm) | Unified interface for OpenAI, Anthropic, Azure, Hugging Face, and more with routing and fallbacks |
