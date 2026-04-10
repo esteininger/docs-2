@@ -61,6 +61,7 @@ For most use cases, define subagents as dictionaries matching the @[`SubAgent`] 
 | `interrupt_on` | `dict[str, bool]` | Optional. Configure [human-in-the-loop](/oss/deepagents/human-in-the-loop) for specific tools. Subagent value overrides main agent. Requires checkpointer.<br></br>Inherits from main agent by default. Subagent value overrides the default. |
 | `skills` | `list[str]` | Optional. [Skills](/oss/deepagents/skills) source paths. When specified, the subagent will load skills from these directories (e.g., `["/skills/research/", "/skills/web-search/"]`). This allows subagents to have different skill sets than the main agent.<br></br>Does not inherit from main agent. Only the general-purpose subagent inherits the main agent's skills. When a subagent has skills, it runs its own independent @[`SkillsMiddleware`] instance. Skill state is fully isolated—a subagent's loaded skills are not visible to the parent, and vice versa. |
 | `response_format` | `ResponseFormat` | Optional. [Structured output](/oss/langchain/structured-output) schema for the subagent. When set, the parent receives the subagent's result as JSON instead of free-form text. Accepts Pydantic models, `ToolStrategy(...)`, `ProviderStrategy(...)`, or a raw schema type. See [Structured output](#structured-output). |
+| `permissions` | `list[FilesystemPermission]` | Optional. [Filesystem permission rules](/oss/deepagents/permissions) for the subagent. When set, **replaces** the parent agent's permissions entirely.<br></br>Inherits from main agent by default. |
 
 :::
 
@@ -82,7 +83,7 @@ For most use cases, define subagents as dictionaries matching the @[`SubAgent`] 
 
 
 <Tip>
-    **CLI users:** You can also define subagents as `AGENTS.md` files on disk instead of in code. The `name`, `description`, and `model` fields map to YAML frontmatter, and the markdown body becomes the `system_prompt`. See [Custom subagents](/oss/deepagents/cli/overview#custom-subagents) for the file format.
+    **CLI users:** You can also define subagents as `AGENTS.md` files on disk instead of in code. The `name`, `description`, and `model` fields map to YAML frontmatter, and the markdown body becomes the `system_prompt`. See [Custom subagents](/oss/deepagents/cli/overview#subagents) for the file format.
 </Tip>
 
 ### CompiledSubAgent
@@ -107,7 +108,7 @@ For complex workflows, use a prebuilt LangGraph graph as a @[`CompiledSubAgent`]
 
 ## Using CompiledSubAgent
 
-For more complex use cases, you can provide your custom subagents.
+For more complex use cases, you can provide your custom subagents with @[`CompiledSubAgent`].
 You can create a custom subagent using LangChain's @[`create_agent`] or by making a custom LangGraph graph using the [graph API](/oss/langgraph/graph-api).
 
 If you're creating a custom LangGraph graph, make sure that the graph has a [state key called `"messages"`](/oss/langgraph/quickstart#2-define-state):
