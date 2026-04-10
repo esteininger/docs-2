@@ -25,6 +25,7 @@ This page explains how to:
 - [choose a backend](#specify-a-backend),
 - [route different paths to different backends](#route-to-different-backends),
 - [implement your own virtual filesystem](#use-a-virtual-filesystem) (e.g., S3 or Postgres),
+- [set permissions](#permissions) on filesystem access,
 
 - [comply with the backend protocol](#protocol-reference),
 
@@ -393,9 +394,41 @@ Postgres-style outline:
 
 
 
+## Permissions
+
+Use [permissions](/oss/python/deepagents/permissions) to declaratively control which files and directories the agent can read or write. Permissions apply to the built-in filesystem tools and are evaluated before the backend is called.
+
+```python
+from deepagents import create_deep_agent, FilesystemPermission
+
+agent = create_deep_agent(
+    backend=CompositeBackend(
+        default=StateBackend(),
+        routes={
+            "/memories/": StoreBackend(
+                namespace=lambda rt: (rt.server_info.user.identity,),
+            ),
+            "/policies/": StoreBackend(
+                namespace=lambda rt: (rt.context.org_id,),
+            ),
+        },
+    ),
+    permissions=[
+        FilesystemPermission(
+            operations=["write"],
+            paths=["/policies/**"],
+            mode="deny",
+        ),
+    ],
+)
+```
+
+
+For the full set of options including rule ordering, subagent permissions, and composite backend interactions, see the [permissions guide](/oss/python/deepagents/permissions).
+
 ## Add policy hooks
 
-Enforce enterprise rules by subclassing or wrapping a backend.
+For custom validation logic beyond path-based allow/deny rules (rate limiting, audit logging, content inspection), enforce enterprise rules by subclassing or wrapping a backend.
 
 Block writes/edits under selected prefixes (subclass):
 

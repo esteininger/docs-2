@@ -62,6 +62,7 @@ Use the **Deep Agents SDK** when you want to build agents that can:
 - **Execute shell commands** via the `execute` tool when using a [sandbox backend](/oss/python/deepagents/sandboxes)
 - **Delegate work** to specialized subagents for context isolation
 - **Persist memory** across conversations and threads
+- **Control filesystem access** with declarative [permission rules](/oss/python/deepagents/permissions) that restrict which files agents can read or write
 - **Require human approval** for sensitive operations with [human-in-the-loop](/oss/python/deepagents/human-in-the-loop) workflows
 - **Use any model** that supports tool calling — [provider agnostic](/oss/python/deepagents/models) across frontier and open models
 
@@ -90,6 +91,9 @@ For building simpler agents, consider using LangChain's [`create_agent`](/oss/py
 <Card title="Long-term memory" icon="database">
     Extend agents with persistent memory across threads using LangGraph's [Memory Store](/oss/python/langgraph/persistence#memory-store). Agents can save and retrieve information from previous conversations.
 </Card>
+<Card title="Filesystem permissions" icon="lock">
+    Declare [permission rules](/oss/python/deepagents/permissions) that control which files and directories agents can read or write. Subagents can inherit or override the parent's rules.
+</Card>
 <Card title="Human-in-the-loop" icon="user-check">
     Configure [human approval](/oss/python/deepagents/human-in-the-loop) for sensitive tool operations using LangGraph's interrupt capabilities. Control which tools require confirmation before execution.
 </Card>
@@ -117,6 +121,9 @@ For building simpler agents, consider using LangChain's [`create_agent`](/oss/py
     </Card>
     <Card title="Sandboxes" icon="cube" href="/oss/python/deepagents/sandboxes">
         Execute code in isolated environments
+    </Card>
+    <Card title="Permissions" icon="lock" href="/oss/python/deepagents/permissions">
+        Control filesystem access with permission rules
     </Card>
     <Card title="Human-in-the-loop" icon="user-check" href="/oss/python/deepagents/human-in-the-loop">
         Configure approval for sensitive operations
