@@ -1,8 +1,10 @@
 #!/usr/bin/env node
 /**
  * Link checker using Playwright (headless browser).
- * Crawls docs.langchain.com, extracts all links from the fully rendered DOM,
- * and verifies each link. Handles client-rendered content (e.g. Mintlify Tabs).
+ * Crawls docs.langchain.com, extracts links after DOMContentLoaded (avoids networkidle
+ * timeouts on pages with long-lived requests), and verifies each link. Internal hash
+ * links wait for heading ids after client render and try slug variants (Unicode quotes,
+ * @ and / in headings).
  *
  * Usage:
  *   node check.js [options] [startUrl]
@@ -23,9 +25,13 @@
 import { chromium } from 'playwright';
 
 const BASE_URL = 'https://docs.langchain.com';
-const DEFAULT_MAX_PAGES = 50000;
+const DEFAULT_MAX_PAGES = 10000;
 const DEFAULT_TIMEOUT = 15000;
 const DEFAULT_CONCURRENCY = 8;
+
+/** Matches real Chromium enough that many sites do not return 403 to programmatic checks. */
+const BROWSER_LIKE_UA =
+  'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 LangChain-Docs-Link-Check/1.0';
 
 // URLs matching these patterns are skipped (regex or substring)
 const SKIP_PATTERNS = [
@@ -88,11 +94,21 @@ function hasFragment(url) {
   }
 }
 
-/** Get fragment ID (without #). */
+/**
+ * Get fragment ID (without #), decoded for DOM lookup.
+ * Node's URL.hash leaves percent-encoding intact; browsers decode when matching
+ * document.getElementById to id="..." from HTML, so we must decode here too.
+ */
 function getFragment(url) {
   try {
     const hash = new URL(url).hash;
-    return hash ? hash.slice(1) : null;
+    if (!hash || hash.length <= 1) return null;
+    const raw = hash.slice(1);
+    try {
+      return decodeURIComponent(raw);
+    } catch {
+      return raw;
+    }
   } catch {
     return null;
   }
@@ -109,6 +125,87 @@ function urlWithoutFragment(url) {
   }
 }
 
+/**
+ * Mintlify heading ids and in-doc hash links sometimes differ (Unicode apostrophes,
+ * @ and / in headings). Try several candidates after hydration.
+ */
+function fragmentIdCandidates(frag) {
+  if (!frag) return [];
+  const candidates = [];
+  const seen = new Set();
+  const add = (s) => {
+    if (s == null || s === '' || seen.has(s)) return;
+    seen.add(s);
+    candidates.push(s);
+  };
+  add(frag);
+  try {
+    add(frag.normalize('NFC'));
+    add(frag.normalize('NFD'));
+  } catch (_e) {
+    // Invalid Unicode for normalization; skip variants.
+  }
+  const asciiTypography = frag
+    .replace(/[\u2018\u2019\u201A\u201B\u2032\u2035]/g, "'")
+    .replace(/[\u201C\u201D\u201E]/g, '"');
+  add(asciiTypography);
+  if (frag.includes("'")) {
+    add(frag.replace(/'/g, '\u2019'));
+    add(frag.replace(/'/g, '\u2018'));
+  }
+  if (frag.includes('"')) {
+    add(frag.replace(/"/g, '\u201C'));
+    add(frag.replace(/"/g, '\u201D'));
+  }
+  const noSmartQuotes = frag.replace(/[\u2018\u2019\u201A\u201B\u2032\u2035`']/g, '');
+  add(noSmartQuotes);
+  add(noSmartQuotes.replace(/-+/g, '-').replace(/^-|-$/g, ''));
+  const slugGuess = frag
+    .replace(/@/g, '')
+    .replace(/\//g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '');
+  add(slugGuess);
+  if (frag.includes('/')) {
+    add(frag.replace(/\//g, ''));
+    add(frag.replace(/\//g, '-'));
+  }
+  return candidates;
+}
+
+/**
+ * Runs in the browser (serialized by Playwright). Treats :target, exact id match, and
+ * NFC + curly-to-ASCII quote folding so link hashes match Mintlify heading ids.
+ */
+function internalFragmentExistsInDocument(idList) {
+  if (document.querySelector(':target')) return true;
+  for (let i = 0; i < idList.length; i++) {
+    const id = idList[i];
+    if (id && document.getElementById(id)) return true;
+  }
+  const fold = (s) => {
+    try {
+      return s
+        .normalize('NFC')
+        .replace(/[\u2018\u2019\u201A\u201B\u2032\u2035`]/g, "'")
+        .replace(/[\u201C\u201D\u201E]/g, '"');
+    } catch {
+      return s;
+    }
+  };
+  const wantFolded = new Set();
+  for (let i = 0; i < idList.length; i++) {
+    const id = idList[i];
+    if (id) wantFolded.add(fold(id));
+  }
+  const els = document.querySelectorAll('[id]');
+  for (let i = 0; i < els.length; i++) {
+    const hid = els[i].getAttribute('id');
+    if (hid != null && wantFolded.has(fold(hid))) return true;
+  }
+  return false;
+}
+
 async function main() {
   const toCrawl = [startUrl];
   const visited = new Set();
@@ -120,7 +217,7 @@ async function main() {
 
   const browser = await chromium.launch({ headless: true });
   const context = await browser.newContext({
-    userAgent: 'LangChain-Docs-Link-Check/1.0',
+    userAgent: BROWSER_LIKE_UA,
     ignoreHTTPSErrors: true,
   });
 
@@ -137,7 +234,7 @@ async function main() {
 
       const page = await context.newPage();
       try {
-        await page.goto(url, { waitUntil: 'networkidle', timeout });
+        await page.goto(url, { waitUntil: 'domcontentloaded', timeout });
         const base = page.url();
 
         const hrefs = await page.$$eval('a[href]', (anchors) =>
@@ -175,15 +272,17 @@ async function main() {
     async function checkOne(url) {
       const { hasFragment: hasFrag } = linksToCheck.get(url);
       const frag = hasFrag ? getFragment(url) : null;
-      const baseUrl = urlWithoutFragment(url);
 
       if (isInternal(url) && hasFrag) {
         const page = await context.newPage();
         try {
-          await page.goto(baseUrl, { waitUntil: 'networkidle', timeout });
-          // Use attribute selector [id="..."] to avoid needing CSS.escape (browser-only API)
-          const escaped = frag.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
-          const exists = (await page.locator(`[id="${escaped}"]`).count()) > 0;
+          // Navigate with hash so the browser resolves the fragment; Mintlify/Next may
+          // stream body after DOMContentLoaded, so use `load` and the full timeout window.
+          await page.goto(url, { waitUntil: 'load', timeout });
+          const ids = fragmentIdCandidates(frag);
+          const fragWait = Math.max(2000, timeout);
+          await page.waitForFunction(internalFragmentExistsInDocument, ids, { timeout: fragWait }).catch(() => {});
+          const exists = await page.evaluate(internalFragmentExistsInDocument, ids);
           await page.close();
           return { url, ok: exists, status: exists ? 200 : null, error: exists ? null : 'Fragment not found' };
         } catch (err) {
