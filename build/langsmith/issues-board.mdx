@@ -1,0 +1,88 @@
+---
+title: Track and resolve agent issues with the Issues Board
+sidebarTitle: Issues
+description: Automatically detect and resolve recurring issues in your tracing project using the Issues Board.
+---
+
+The Issues Board monitors your tracing project and automatically surfaces recurring problems your agent encounters. An AI agent analyzes your traces, groups them into issues, and for each issue proposes a root cause, a code fix, and an evaluator you can deploy to catch regressions.
+
+## Set up the Issues Board
+
+1. Navigate to **Tracing** in the UI sidebar and select a project.
+2. Click the **Issues** tab in the project navigation.
+3. Optionally, connect a GitHub repository under **Connect your agent's code repository**. LangSmith uses your source code to diagnose problems and generate fixes. Only repositories the GitHub app can access are shown — click **Manage app access** to update permissions.
+4. Optionally, select categories under **What matters most to you?** to prioritize specific issue types for review. Available categories include Cost & Tokens, Latency, Reliability & Errors, Output Quality, Tool call failures, Hallucinations, Context & Memory, and Safety & Guardrails. Click **+ Add something specific** to describe a custom concern.
+5. Click **Start Analyzing**.
+
+Once you click **Start Analyzing**, LangSmith spins up a sandbox environment to analyze your project. The agent takes up to 20 minutes to complete, querying your traces for issues and generating an agent overview document.
+
+### Review the agent overview document
+
+Before surfacing issues, the agent generates an overview document describing your project's purpose, architecture, and key metrics based on your traces. Review and edit the document, then click **Accept & Continue** to proceed. You can update it at any time from the [Issues Board settings](#configure-the-issues-board).
+
+## Understand the issues list
+
+Once setup is complete, the **Issues** tab displays a list of automatically detected issues in the left panel. Each entry shows a title, a short description, the number of contributing traces, and how recently the issue was observed.
+
+Click any issue to display its details in the right panel.
+
+## Review an issue
+
+The detail panel provides a full diagnosis and resolution.
+
+At the top, a summary describes the problem and its impact. Below that, **Linked traces** lists the traces that support the diagnosis. Click any linked trace to open the trace details panel. For more information on working with traces, see [Filter traces](/langsmith/filter-traces-in-application).
+
+The **Proposed Fix** section provides a root cause analysis and a code diff showing the suggested change to your codebase.
+
+The **Suggested Evaluator** section provides ready-to-use evaluator code you can deploy to catch the issue in future traces.
+
+## Take action on an issue
+
+### Change priority
+
+Select **Change to Low** or **Change to High** from the priority badge to update an issue's priority. You can optionally provide a reason.
+
+### Create an evaluator
+
+Click **Create Evaluator** to open a pre-filled code evaluator based on the suggested evaluator for the issue. Configure the name, run filters, and sampling rate, and edit the code directly in the built-in editor if needed. Use the **Test Code** tab to run the evaluator in a sandbox before saving. Enable **Apply to past runs** to see how many historical traces the evaluator would have flagged, which helps validate its accuracy before deploying.
+
+### Copy the fix prompt
+
+Click **Copy Fix Prompt** to copy the proposed fix as a prompt you can use directly with an LLM or coding assistant to apply the fix to your codebase. The same button is also available next to the **Suggested Evaluator**.
+
+### Open a pull request
+
+Click **Open PR** to open a GitHub pull request in your connected repository with the proposed fix applied.
+
+### Close an issue
+
+Click **Close issue** and choose one of the following options:
+
+- **Resolved**: The issue has been fixed.
+- **Ignore**: The issue is not real or not worth fixing.
+
+You can optionally provide a reason.
+
+### Reopen an issue
+
+To reopen a previously closed issue, open the issue detail view and click **Reopen issue**.
+
+## Configure the Issues Board
+
+Click the gear icon on the **Issues** tab to open the settings panel. From here you can:
+
+- **Agent Overview**: Edit the agent overview document to keep the agent's understanding of your project accurate as your application evolves.
+- **Scan schedule**: The Issues Board scans your traces every 6 hours by default. Click **Edit** to change the frequency or **Pause** to suspend scanning.
+- **Code repository**: Update the connected GitHub repository or subfolder.
+- **Delete board**: Permanently remove the Issues Board and all its settings. This action cannot be undone.
+
+---
+
+<div className="source-links">
+<Callout icon="edit">
+    [Edit this page on GitHub](https://github.com/langchain-ai/docs/edit/main/src/langsmith/issues-board.mdx) or [file an issue](https://github.com/langchain-ai/docs/issues/new/choose).
+</Callout>
+<Callout icon="terminal-2">
+    [Connect these docs](/use-these-docs) to Claude, VSCode, and more via MCP for real-time answers.
+</Callout>
+</div>
