@@ -1,0 +1,10 @@
+```python
+# If both sources contain a skill named "web-search",
+# the one from "/skills/project/" wins (loaded last).
+from deepagents import create_deep_agent
+
+agent = create_deep_agent(
+    model="openai:gpt-5.4",
+    skills=["/skills/user/", "/skills/project/"],
+)
+```
