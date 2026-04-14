@@ -175,7 +175,7 @@ import { createDeepAgent, LangSmithSandbox } from "deepagents";
 const sandbox = await LangSmithSandbox.create();
 
 export const agent = createDeepAgent({
-  model: "anthropic:claude-sonnet-4-5",
+  model: "google_genai:gemini-3.1-pro-preview",
   backend: sandbox,
   systemPrompt: "You are an expert developer working on a project in /app.",
 });
@@ -227,7 +227,7 @@ const sandbox = new LangSmithSandbox({
 });
 
 export const agent = createDeepAgent({
-  model: "anthropic:claude-sonnet-4-5",
+  model: "google_genai:gemini-3.1-pro-preview",
   backend: sandbox,
   systemPrompt: "You are an expert developer working on a project in /app.",
 });

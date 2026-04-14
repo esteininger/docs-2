@@ -601,7 +601,7 @@ Without limits, a confused agent can burn through your LLM API budget in minutes
 import { createAgent, modelCallLimitMiddleware, toolCallLimitMiddleware } from "langchain";
 
 const agent = createAgent({
-  model: "claude-sonnet-4-6",
+  model: "google_genai:gemini-3.1-pro-preview",
   middleware: [
     modelCallLimitMiddleware({ runLimit: 50 }),
     toolCallLimitMiddleware({ runLimit: 200 }),
@@ -629,7 +629,7 @@ import {
 } from "langchain";
 
 const agent = createAgent({
-  model: "claude-sonnet-4-6",
+  model: "google_genai:gemini-3.1-pro-preview",
   middleware: [
     // Retry model calls on rate limits, timeouts, and 5xx errors
     modelRetryMiddleware({ maxRetries: 3, backoffFactor: 2.0, initialDelayMs: 1000 }),
@@ -658,7 +658,7 @@ If your agent processes user input that might contain emails, credit card number
 import { createAgent, piiMiddleware } from "langchain";
 
 const agent = createAgent({
-  model: "claude-sonnet-4-6",
+  model: "google_genai:gemini-3.1-pro-preview",
   middleware: [
     piiMiddleware("email", { strategy: "redact", applyToInput: true }),
     piiMiddleware("credit_card", { strategy: "mask", applyToInput: true }),

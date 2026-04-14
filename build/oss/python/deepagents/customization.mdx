@@ -89,7 +89,7 @@ from deepagents import create_deep_agent
 
 agent = create_deep_agent(
     model=init_chat_model(
-        model="claude-sonnet-4-6",
+        model="google_genai:gemini-3.1-pro-preview",
         max_retries=10,  # Increase for unreliable networks (default: 6)
         timeout=120,     # Increase timeout for slow connections
     ),
@@ -131,7 +131,7 @@ def internet_search(
     )
 
 agent = create_deep_agent(
-    model="openai:gpt-5.4",
+    model="google_genai:gemini-3.1-pro-preview",
     tools=[internet_search]
 )
 ```
@@ -155,7 +155,7 @@ thorough research, and then write a polished report. \
 """
 
 agent = create_deep_agent(
-    model="openai:gpt-5.4",
+    model="google_genai:gemini-3.1-pro-preview",
     system_prompt=research_instructions,
 )
 ```
@@ -231,7 +231,7 @@ def log_tool_calls(request, handler):
 
 
 agent = create_deep_agent(
-    model="openai:gpt-5.4",
+    model="google_genai:gemini-3.1-pro-preview",
     tools=[get_weather],
     middleware=[log_tool_calls],
 )
@@ -429,7 +429,7 @@ You can pass one or more file paths to the `memory` parameter when creating your
         checkpointer = MemorySaver()
 
         agent = create_deep_agent(
-            model="openai:gpt-5.4",
+            model="google_genai:gemini-3.1-pro-preview",
             memory=[
                 "/AGENTS.md"
             ],
@@ -473,7 +473,7 @@ You can pass one or more file paths to the `memory` parameter when creating your
         )
 
         agent = create_deep_agent(
-            model="openai:gpt-5.4",
+            model="google_genai:gemini-3.1-pro-preview",
             backend=StoreBackend(),
             store=store,
             memory=[
@@ -505,7 +505,7 @@ You can pass one or more file paths to the `memory` parameter when creating your
         checkpointer = MemorySaver()
 
         agent = create_deep_agent(
-            model="openai:gpt-5.4",
+            model="google_genai:gemini-3.1-pro-preview",
             backend=FilesystemBackend(root_dir="/Users/user/{project}"),
             memory=[
                 "./AGENTS.md"
@@ -565,7 +565,7 @@ class WeatherReport(BaseModel):
 
 
 agent = create_deep_agent(
-    model="openai:gpt-5.4",
+    model="google_genai:gemini-3.1-pro-preview",
     response_format=WeatherReport,
     tools=[internet_search]
 )
@@ -585,6 +585,7 @@ print(result["structured_response"])
 
 
 For more information and examples, see [response format](/oss/python/langchain/structured-output#response-format).
+n and examples, see [response format](/oss/python/langchain/structured-output#response-format).
 
 ---
 

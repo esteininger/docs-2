@@ -175,7 +175,7 @@ from deepagents import create_deep_agent
 from deepagents.sandbox import LangSmithSandbox  # or DaytonaSandbox, etc.
 
 sandbox = LangSmithSandbox.create()
-agent = create_deep_agent(model="anthropic:claude-sonnet-4-5", backend=sandbox)
+agent = create_deep_agent(model="google_genai:gemini-3.1-pro-preview", backend=sandbox)
 ```
 
 
@@ -211,7 +211,7 @@ sandbox = LangSmithSandbox(
 )
 
 agent = create_deep_agent(
-    model="anthropic:claude-sonnet-4-5",
+    model="google_genai:gemini-3.1-pro-preview",
     backend=sandbox,
 )
 ```

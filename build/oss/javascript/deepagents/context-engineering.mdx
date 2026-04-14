@@ -55,7 +55,7 @@ Your custom system prompt is prepended to the built-in system prompt, which incl
 import { createDeepAgent } from "deepagents";
 
 const agent = await createDeepAgent({
-  model: "claude-sonnet-4-6",
+  model: "google_genai:gemini-3.1-pro-preview",
   systemPrompt: `You are a research assistant specializing in scientific literature.
   Always cite sources. Use subagents for parallel research on different topics.`,
 });
@@ -81,7 +81,7 @@ Memory files ([`AGENTS.md`](https://agents.md/)) provide persistent context that
 
 ```typescript
 const agent = await createDeepAgent({
-  model: "claude-sonnet-4-6",
+  model: "google_genai:gemini-3.1-pro-preview",
   memory: ["/project/AGENTS.md", "~/.deepagents/preferences.md"],
 });
 ```
@@ -97,7 +97,7 @@ Skills provide **on-demand** capabilities. The agent reads frontmatter from each
 
 ```typescript
 const agent = await createDeepAgent({
-  model: "claude-sonnet-4-6",
+  model: "google_genai:gemini-3.1-pro-preview",
   skills: ["/skills/research/", "/skills/web-search/"],
 });
 ```
@@ -191,7 +191,7 @@ const fetchUserData = tool(
 );
 
 const agent = await createDeepAgent({
-  model: "claude-sonnet-4-6",
+  model: "google_genai:gemini-3.1-pro-preview",
   tools: [fetchUserData],
   contextSchema,
 });
@@ -308,7 +308,7 @@ import { createDeepAgent, CompositeBackend, StateBackend, StoreBackend } from "d
 import { InMemoryStore } from "@langchain/langgraph-checkpoint";
 
 const agent = await createDeepAgent({
-  model: "claude-sonnet-4-6",
+  model: "google_genai:gemini-3.1-pro-preview",
   store: new InMemoryStore(),
   backend: new CompositeBackend(
     new StateBackend(),

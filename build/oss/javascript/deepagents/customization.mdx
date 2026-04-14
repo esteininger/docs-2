@@ -258,7 +258,7 @@ const logToolCallsMiddleware = createMiddleware({
 });
 
 const agent = await createDeepAgent({
-  model: "anthropic:claude-sonnet-4-6",
+  model: "google_genai:gemini-3.1-pro-preview",
   tools: [getWeather] as any,
   middleware: [logToolCallsMiddleware] as any,
 });
@@ -662,6 +662,7 @@ console.log(result.structuredResponse);
 
 
 For more information and examples, see [response format](/oss/javascript/langchain/structured-output#response-format).
+n and examples, see [response format](/oss/javascript/langchain/structured-output#response-format).
 
 ---
 

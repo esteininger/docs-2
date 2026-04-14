@@ -235,7 +235,7 @@ const researchSubagent = {
 };
 
 const agent = await createDeepAgent({
-  model: "claude-sonnet-4-6",
+  model: "google_genai:gemini-3.1-pro-preview",
   skills: ["/skills/main/"],  // Main agent and GP subagent get these
   subagents: [researchSubagent],  // Researcher gets only its own skills
 });
