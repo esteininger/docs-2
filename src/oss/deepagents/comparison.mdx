@@ -36,7 +36,7 @@ This page helps you understand how [LangChain Deep Agents](/oss/deepagents/overv
 
 **Claude Agent SDK**:
 - **Standardize on Claude**: First-class support for Claude models across Anthropic, Azure, Vertex AI, and AWS Bedrock
-- **Custom hosting**: Build your own HTTP/WebSocket layer and run the SDK in containers
+- **Local-first design**: Built on top of Claude Code, a local CLI tool. Production deployment requires building and maintaining your own HTTP/WebSocket layer and running the SDK in containers.
 - **Hooks**: Easily intercept and control agent behavior
 
 **Codex SDK**:
@@ -44,6 +44,24 @@ This page helps you understand how [LangChain Deep Agents](/oss/deepagents/overv
 - **OS-level sandbox modes**: Use built-in `read-only`, `workspace-write`, or `danger-full-access` modes
 - **MCP server mode**: Expose your agent as an MCP server with `codex mcp-server`
 - **Observability**: Use [OpenAI Traces](https://developers.openai.com/codex/guides/agents-sdk/#trace-the-workflow)
+
+## Deployment
+
+Claude Agent SDK is built on top of Claude Code, a local CLI tool, and is designed primarily for local development. To serve it in production, you build and maintain your own HTTP/WebSocket layer and run the SDK in containers. There is no built-in multi-tenant authentication, webhook support, cron scheduling, or observability.
+
+DeepAgents is designed for production from the start. Running `deepagents deploy` packages your agent and deploys it as a [LangSmith Deployment](/langsmith/deployment): a horizontally scalable server with built-in multi-tenant authentication, open-protocol endpoints, webhooks, cron, and LangSmith observability. Deployments are self-hostable.
+
+| | **Deep Agents** | **Claude Agent SDK** |
+| --- | --- | --- |
+| Deployment approach | `deepagents deploy` (one command) | Build your own HTTP/WebSocket layer |
+| Multi-tenant auth | ✅ [Built-in](/langsmith/auth) | ❌ |
+| Webhooks | ✅ | ❌ |
+| Cron | ✅ | ❌ |
+| Standard protocol endpoints | MCP, A2A, Agent Protocol | Proprietary |
+| Self-hosting | ✅ | ✅ (container-based) |
+| Observability | ✅ [LangSmith](/langsmith/home) | ❌ |
+
+For more detail, see [Deploy with the CLI](/oss/deepagents/deploy) and [Going to production](/oss/deepagents/going-to-production).
 
 ## Feature comparison
 
